@@ -6,6 +6,7 @@ const config: Options = defineConfig({
   entitiesTs: ['src/**/*.entity.ts'],
   clientUrl: process.env.DB_URL,
   debug: process.env.NODE_ENV !== 'production',
+  dbName: process.env.DB_NAME,
 });
 
 export default config;
