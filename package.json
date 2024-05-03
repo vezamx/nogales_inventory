@@ -70,7 +70,11 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/helpers/*.(t|j)s",
+      "**/*.{!(module),}.(t|j)s",
+      "!mikro-orm.config.ts",
+      "!**/*.entity.(t|j)s",
+      "!**/*.dto.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
