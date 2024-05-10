@@ -1,4 +1,4 @@
-import { Enum, Property, Unique } from '@mikro-orm/core';
+import { Entity, Enum, Property, Unique } from '@mikro-orm/core';
 import { BaseEntityData } from './base';
 
 export enum EUnidadInsumo {
@@ -9,6 +9,7 @@ export enum EUnidadInsumo {
 
 export type TUnidadInsumo = keyof typeof EUnidadInsumo;
 
+@Entity()
 export class Insumos extends BaseEntityData {
   @Property()
   @Unique()
