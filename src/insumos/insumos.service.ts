@@ -6,10 +6,11 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Insumos } from 'src/entities/insumos.entity';
+import { Insumos } from '../entities/insumos.entity';
 import { InsumoCreateDto } from './dto/insumoCreate.dto';
 import { InsumoUpdateDto } from './dto/insumoUpdate.dto';
-import { ERROR_MESSAGES } from '../utils/constants';
+import { ERROR_MESSAGES, MODELS } from '../utils/constants';
+import { FormatResourceChangeMessage } from '../utils/messageFormatter';
 
 @Injectable()
 export class InsumosService {
@@ -36,7 +37,8 @@ export class InsumosService {
       await this.em.persistAndFlush(insumo);
 
       //TODO: Implementar el servicio de transacciones para llevar un control de los movimientos de los insumos
-      this.logger.log(`Insumo creado: ${insumo.nombre}`);
+      this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'create'));
+
       return insumo;
     } catch (error) {
       this.logger.error(error.message);
@@ -65,21 +67,23 @@ export class InsumosService {
         default:
           throw new BadRequestException(ERROR_MESSAGES.INVALID_OPERATION);
       }
+      this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
       await this.em.persistAndFlush(insumo);
       //TODO: Implementar ek servicio de transacciones para llevar un control de los movimientos de los insumos
       return insumo;
     } catch (error) {
       this.logger.error(error.message);
-      throw new InternalServerErrorException(error.message);
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      } else throw new InternalServerErrorException(error.message);
     }
   }
 
   async dropProductInsumos(idProducto: string) {
-    try {
-      return `Restando insumos del producto con id: ${idProducto}`;
-    } catch (error) {
-      this.logger.error(error.message);
-      throw new InternalServerErrorException(error.message);
-    }
+    this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
+    return `Restando insumos del producto con id: ${idProducto}`;
   }
 }

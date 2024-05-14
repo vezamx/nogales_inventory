@@ -6,3 +6,8 @@ export const ERROR_MESSAGES = {
   INTERNAL_SERVER_ERROR:
     'La operación no pudo ser completada. Inténtalo más tarde.',
 };
+
+export const MODELS = {
+  INSUMOS: 'Insumos',
+  USERS: 'Users',
+};

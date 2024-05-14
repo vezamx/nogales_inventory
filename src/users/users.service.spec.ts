@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
-import { User } from '../entiies/user.entity';
+import { User } from '../entities/user.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 
 describe('UsersService', () => {

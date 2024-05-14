@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
-import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
+import { ObjectId } from '@mikro-orm/mongodb';
 import { UsersService } from './users.service';
-import { User } from 'src/entiies/user.entity';
+import { User } from 'src/entities/user.entity';
 import { NotFoundException } from '@nestjs/common';
 
 describe('UsersController', () => {

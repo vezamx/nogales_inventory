@@ -12,7 +12,7 @@ export class InsumosController {
     return await this.insumosService.find();
   }
   @Get('/:id')
-  async findOne(id: string) {
+  async findOne(@Param('id') id: string) {
     return await this.insumosService.findOne(id);
   }
 
