@@ -13,5 +13,8 @@ export class User extends BaseEntityData {
   email: string;
 
   @Property()
+  turno: number;
+
+  @Property()
   llaveEmpleado: string;
 }
