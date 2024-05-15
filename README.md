@@ -2,7 +2,7 @@
 
 ## Description
 
-Microservicio de inventario para casa nogales.
+Microservicio de inventario para casa nogal.
 
 Servicio que controla todos los insumos, usuarios y control de autorización de transacciones
 
@@ -12,10 +12,10 @@ Localmente el proyecto lo puedes correr de diferentes formas, docker o mediante 
 
 ## Pre requisitos
 
-Antes de construir o iniciar la aplicación mediante terminal necesitamos configurar las variables de entorno, para ello copiaremos el archivo .env.local y setearemos las variables que correspondan
+Antes de construir o iniciar la aplicación mediante terminal necesitamos configurar las variables de entorno, para ello copiaremos el archivo .env.example y setearemos las variables que correspondan
 
 ```bash
-$ cp .env.local .env
+$ cp .env.example .env
 ```
 
 En caso de que no conozcas el valor para alguna env solicitalo en [discord](https://discord.gg/TdBCEjw3zH).
