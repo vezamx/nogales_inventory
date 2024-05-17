@@ -1,4 +1,9 @@
-import { Entity, Property, SerializedPrimaryKey } from '@mikro-orm/core';
+import {
+  Entity,
+  OneToMany,
+  Property,
+  SerializedPrimaryKey,
+} from '@mikro-orm/core';
 import { BaseEntityData } from './base';
 
 @Entity()
