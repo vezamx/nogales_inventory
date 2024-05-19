@@ -15,27 +15,31 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    if (!request.headers.Authorization) {
+    if (!request.headers.authorization) {
       return false;
     }
-
     const roles = Reflect.getMetadata('roles', context.getHandler());
 
-    if (!roles) {
-      return true;
-    }
+    try {
+      const [_, token] = request.headers.authorization.split(' ');
 
-    const { id, role } = verify(
-      request.headers.Authorization,
-      process.env.JWT_SECRET,
-    ) as JWTPayload;
+      const { id, role } = verify(token, process.env.JWT_SECRET) as JWTPayload;
 
-    if (!roles.includes(role)) {
+      if (!roles || roles.length === 0) {
+        request.user = { id, role };
+        return request;
+      }
+
+      if (!roles.includes(role)) {
+        return false;
+      }
+
+      request.user = { id, role };
+
+      return request;
+    } catch (error) {
+      console.log('Valio queso la autenticacion');
       return false;
     }
-
-    request.user = { id, role };
-
-    return true;
   }
 }

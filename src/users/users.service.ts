@@ -18,10 +18,6 @@ export class UsersService {
   async create(userData: UserCreateDto) {
     try {
       const user = this.em.create(User, userData);
-      user.llaveEmpleado = await generarLlaveEmpleado(
-        user.name,
-        user.noEmpleado,
-      );
 
       await this.em.persistAndFlush(user);
       return user;

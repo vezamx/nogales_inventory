@@ -6,7 +6,7 @@ export enum ERole {
   USER = 'user',
 }
 
-export type TRole = keyof typeof ERole;
+export type TRole = `${ERole}`;
 @Entity()
 export class User extends BaseEntityData {
   @Property()
@@ -16,11 +16,8 @@ export class User extends BaseEntityData {
   noEmpleado: number;
 
   @Enum({ items: () => ERole, default: ERole.USER })
-  role: TRole;
+  role: TRole = ERole.USER;
 
   @Property()
   email: string;
-
-  @Property()
-  llaveEmpleado: string;
 }

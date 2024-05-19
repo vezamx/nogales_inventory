@@ -24,6 +24,7 @@ export class ProductosService {
   }
   async create(productoData: ProductosCreateDto) {
     this.logger.log('Creating a new product, ', productoData);
-    return 'Producto creado correctamente';
+    //TODO: Implementar la creacion de un producto
+    return { message: 'Producto creado correctamente' };
   }
 }
