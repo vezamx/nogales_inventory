@@ -1,6 +1,15 @@
-import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
+import {
+  Cascade,
+  Collection,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  Property,
+  Unique,
+} from '@mikro-orm/core';
 import { BaseEntityData } from './base';
 import { User } from './user.entity';
+import { Insumos } from './insumos.entity';
 @Entity()
 export class Productos extends BaseEntityData {
   @Property()
@@ -18,6 +27,9 @@ export class Productos extends BaseEntityData {
 
   @Property()
   costo: number;
+
+  @ManyToMany({ entity: () => Insumos, cascade: [Cascade.ALL] })
+  insumos = new Collection<Insumos>(this);
 
   @ManyToOne()
   updatedBy: User;

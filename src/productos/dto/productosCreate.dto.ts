@@ -1,4 +1,11 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class ProductosCreateDto {
   @IsString()
@@ -16,4 +23,17 @@ export class ProductosCreateDto {
 
   @IsNumber()
   costo: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ArrayMinSize(1)
+  insumos: InsmoArray[];
+}
+
+export class InsmoArray {
+  @IsString()
+  id: string;
+
+  @IsNumber()
+  cantidad: number;
 }

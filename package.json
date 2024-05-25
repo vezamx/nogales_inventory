@@ -76,7 +76,9 @@
       "**/*.{!(module),}.(t|j)s",
       "!mikro-orm.config.ts",
       "!**/*.entity.(t|j)s",
-      "!**/*.dto.(t|j)s"
+      "!**/*.dto.(t|j)s",
+      "!**/*.decorator.(t|j)s",
+      "!**/*.guard.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

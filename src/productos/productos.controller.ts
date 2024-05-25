@@ -4,13 +4,15 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ProductosService } from './productos.service';
-import { AuthGuard } from 'src/guards/authentication.guard';
+import { AuthGuard } from '../guards/authentication.guard';
 import { ProductosCreateDto } from './dto/productosCreate.dto';
-import { CustomRequest } from 'src/utils/types';
+import { CustomRequest } from '../utils/types';
+import { ProductoUpdateDto } from './dto/producto.update';
 
 @UseGuards(AuthGuard)
 @Controller('productos')
@@ -31,7 +33,15 @@ export class ProductosController {
     @Body() productoData: ProductosCreateDto,
     @Req() req: CustomRequest,
   ) {
-    console.log(req.user, 'Aqui esta el usuario');
-    return await this.productosService.create(productoData);
+    return await this.productosService.create(productoData, req.user.id);
+  }
+
+  @Put('/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() productoData: ProductoUpdateDto,
+    @Req() req: CustomRequest,
+  ) {
+    return await this.productosService.update(id, productoData, req.user.id);
   }
 }
