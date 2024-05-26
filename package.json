@@ -66,6 +66,9 @@
       "json",
       "ts"
     ],
+    "setupFiles": [
+      "<rootDir>/jest/setEnvVars.js"
+    ],
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
