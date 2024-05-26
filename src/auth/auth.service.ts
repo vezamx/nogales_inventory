@@ -1,8 +1,8 @@
 import { EntityManager } from '@mikro-orm/mongodb';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
-import { User } from 'src/entities/user.entity';
-import { ERROR_MESSAGES } from 'src/utils/constants';
+import { User } from '../entities/user.entity';
+import { ERROR_MESSAGES } from '../utils/constants';
 require('dotenv').config();
 
 @Injectable()

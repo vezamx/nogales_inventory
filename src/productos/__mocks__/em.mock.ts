@@ -3,4 +3,6 @@ export const mockedEm = {
   find: jest.fn(),
   create: jest.fn(),
   persistAndFlush: jest.fn(),
+  findOneOrFail: jest.fn(),
+  assign: jest.fn(),
 };

@@ -65,7 +65,9 @@ export class ProductosService {
 
       const producto = await this.em.fork().findOneOrFail(Productos, { id });
 
-      wrap(producto).assign(productoData);
+      this.em.assign(producto, ProductoUpdateDto as Partial<User>, {
+        mergeObjectProperties: true,
+      });
 
       producto.updatedBy = user;
 

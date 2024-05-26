@@ -45,8 +45,8 @@ describe('UsersService', () => {
         id: '1',
         name: 'test',
         email: 'test@test.com',
-        llaveEmpleado: 'test',
         noEmpleado: 1,
+        role: 'user',
         createdAt: new Date(),
         updatedAt: new Date(),
         _id: ObjectId.createFromTime(1),
@@ -69,10 +69,9 @@ describe('UsersService', () => {
         id: '1',
         name: 'test',
         email: 'test@test.com',
-        llaveEmpleado: 'test',
         noEmpleado: 1,
+        role: 'user',
         createdAt: new Date(),
-
         updatedAt: new Date(),
         _id: ObjectId.createFromTime(1),
       };
