@@ -1,6 +1,12 @@
-import { Entity, Property, SerializedPrimaryKey } from '@mikro-orm/core';
+import { Entity, Enum, Property, SerializedPrimaryKey } from '@mikro-orm/core';
 import { BaseEntityData } from './base';
 
+export enum ERole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
+export type TRole = `${ERole}`;
 @Entity()
 export class User extends BaseEntityData {
   @Property()
@@ -9,9 +15,9 @@ export class User extends BaseEntityData {
   @SerializedPrimaryKey({ autoincrement: true, primary: false })
   noEmpleado: number;
 
-  @Property()
-  email: string;
+  @Enum({ items: () => ERole, default: ERole.USER })
+  role: TRole = ERole.USER;
 
   @Property()
-  llaveEmpleado: string;
+  email: string;
 }

@@ -45,11 +45,11 @@ describe('UsersController', () => {
         id: '1',
         name: 'test',
         email: 'test@test.com',
-        llaveEmpleado: 'test',
         noEmpleado: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
         _id: ObjectId.createFromTime(1),
+        role: 'user',
       };
 
       jest.spyOn(service, 'findOne').mockResolvedValueOnce(userMock);
@@ -72,8 +72,8 @@ describe('UsersController', () => {
         id: '1',
         name: 'test',
         email: 'test@test.com',
-        llaveEmpleado: 'test',
         noEmpleado: 1,
+        role: 'user',
         createdAt: new Date(),
         updatedAt: new Date(),
         _id: ObjectId.createFromTime(1),
