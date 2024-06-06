@@ -6,9 +6,17 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { InsumosModule } from './insumos/insumos.module';
 import { ProductosModule } from './productos/productos.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
-  imports: [MikroOrmModule.forRoot(), AuthModule, UsersModule, InsumosModule, ProductosModule],
+  imports: [
+    MikroOrmModule.forRoot(),
+    AuthModule,
+    UsersModule,
+    InsumosModule,
+    ProductosModule,
+    RolesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -2,7 +2,6 @@ import { EntityManager } from '@mikro-orm/mongodb';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { UserCreateDto } from './dto/user_create.dto';
-import { generarLlaveEmpleado } from './helpers/userinformation';
 
 @Injectable()
 export class UsersService {

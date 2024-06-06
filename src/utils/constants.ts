@@ -5,6 +5,7 @@ export const ERROR_MESSAGES = {
   NOT_FOUND: 'El recurso solicitado existe.',
   INTERNAL_SERVER_ERROR:
     'La operación no pudo ser completada. Inténtalo más tarde.',
+  CONTENT_DUPLICATED: 'El contenido ya existe.',
 };
 
 export const MODELS = {
