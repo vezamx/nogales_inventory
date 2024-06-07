@@ -5,6 +5,7 @@ import { User } from '../entities/user.entity';
 import { verify } from 'jsonwebtoken';
 import { mockedEm } from '../productos/__mocks__/em.mock';
 import { BadRequestException } from '@nestjs/common';
+import { Roles } from '../entities/roles.entity';
 require('dotenv').config();
 
 describe('AuthService', () => {
@@ -48,7 +49,14 @@ describe('AuthService', () => {
   });
   describe('Generate Token', () => {
     it('should return a token', async () => {
-      const user = orm.em.create(User, {});
+      const user = orm.em.create(User, {
+        name: 'test',
+        email: 'test@test.com',
+        role: orm.em.create(Roles, {
+          name: 'admin',
+          permissions: [],
+        }),
+      });
 
       jest.spyOn(em, 'findOne').mockResolvedValue(user);
 

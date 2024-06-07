@@ -1,9 +1,21 @@
-import { CanActivate, ExecutionContext, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
-import { RolesService } from 'src/roles/roles.service';
-import { CustomRequest, EPermissionContext, JWTPayload } from 'src/utils/types';
+import { RolesService } from '../roles/roles.service';
+import { CustomRequest, EPermissionContext, JWTPayload } from '../utils/types';
 require('dotenv').config();
 
+enum MapMethodToAction {
+  GET = 'read',
+  POST = 'create',
+  PUT = 'update',
+  DELETE = 'delete',
+}
+@Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly rolesService: RolesService) {}
   private logger = new Logger(AuthGuard.name);
@@ -41,7 +53,8 @@ export class AuthGuard implements CanActivate {
 
     const permiso = userRole.permissions.find(
       (permission) =>
-        permission.context === contexto && permission.action === request.method,
+        permission.context === contexto &&
+        permission.action === MapMethodToAction[request.method],
     );
 
     if (!permiso) {

@@ -1,12 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
-import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
-import { User } from '../entities/user.entity';
+import { EntityManager, MikroORM, defineConfig } from '@mikro-orm/mongodb';
 import { InternalServerErrorException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Roles } from '../entities/roles.entity';
+import { User } from '../entities/user.entity';
+import { UsersService } from './users.service';
+import { mockedEm } from '../productos/__mocks__/em.mock';
 
 describe('UsersService', () => {
   let service: UsersService;
   let entityManager: EntityManager;
+  let orm: MikroORM;
+
+  beforeAll(async () => {
+    const config = defineConfig({
+      dbName: 'test',
+      entities: ['dist/**/*.entity.js'],
+      entitiesTs: ['src/**/*.entity.ts'],
+      connect: false,
+      allowGlobalContext: true,
+    });
+
+    orm = await MikroORM.init(config);
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,10 +30,8 @@ describe('UsersService', () => {
         {
           provide: EntityManager,
           useValue: {
-            find: jest.fn(),
-            findOne: jest.fn(),
-            persistAndFlush: jest.fn(),
-            create: jest.fn(),
+            fork: jest.fn(() => mockedEm),
+            ...mockedEm,
           },
         },
       ],
@@ -41,16 +54,14 @@ describe('UsersService', () => {
   });
   describe('findOne', () => {
     it('should return a user', async () => {
-      const userMock: User = {
-        id: '1',
+      const userMock: User = orm.em.create(User, {
         name: 'test',
         email: 'test@test.com',
-        noEmpleado: 1,
-        role: 'user',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        _id: ObjectId.createFromTime(1),
-      };
+        role: orm.em.create(Roles, {
+          name: 'user',
+          permissions: [],
+        }),
+      });
       jest.spyOn(entityManager, 'findOne').mockResolvedValueOnce(userMock);
 
       const user = await service.findOne('1');
@@ -65,21 +76,23 @@ describe('UsersService', () => {
   });
   describe('create', () => {
     it('should create a user', async () => {
-      const userMock: User = {
-        id: '1',
+      const roleMock = orm.em.create(Roles, {
+        name: 'admin',
+        permissions: [],
+      });
+
+      const userMock: User = orm.em.create(User, {
         name: 'test',
         email: 'test@test.com',
-        noEmpleado: 1,
-        role: 'user',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        _id: ObjectId.createFromTime(1),
-      };
-      jest.spyOn(entityManager, 'create').mockReturnValueOnce(userMock);
+        role: roleMock,
+      });
 
+      jest.spyOn(entityManager, 'create').mockReturnValueOnce(userMock);
+      jest.spyOn(entityManager, 'findOne').mockResolvedValueOnce(roleMock);
       const user = await service.create({
         name: 'test',
         email: 'test@test.com',
+        role: 'admin',
       });
       expect(user).toEqual(userMock);
       expect(entityManager.persistAndFlush).toBeCalledTimes(1);
@@ -93,6 +106,7 @@ describe('UsersService', () => {
         await service.create({
           name: 'test',
           email: 'test@test.com',
+          role: 'admin',
         });
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);

@@ -5,10 +5,13 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserCreateDto } from './dto/user_create.dto';
+import { AuthGuard } from '../guards/authentication.guard';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
