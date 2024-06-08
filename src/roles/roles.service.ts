@@ -10,6 +10,7 @@ import { User } from '../entities/user.entity';
 import { ERROR_MESSAGES } from '../utils/constants';
 import { TPermission } from '../utils/types';
 import { RolesCreateDto } from './dto/rolesCreate.dto';
+import * as _ from 'lodash';
 
 @Injectable()
 export class RolesService {
@@ -94,7 +95,7 @@ export class RolesService {
     }
 
     role.permissions = role.permissions.filter(
-      (permission) => !permissions.includes(permission),
+      (permission) => !permissions.some((p) => _.isEqual(p, permission)),
     );
 
     await this.em.persistAndFlush(role);
