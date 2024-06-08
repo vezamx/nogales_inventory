@@ -1,16 +1,17 @@
 import { MikroORM, defineConfig } from '@mikro-orm/mongodb';
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CustomRequest } from 'src/utils/types';
 import { Productos } from '../entities/productos.entity';
 import { ProductosController } from './productos.controller';
 import { ProductosService } from './productos.service';
-import { NotFoundException } from '@nestjs/common';
-import { Request } from 'express';
-import { CustomRequest } from 'src/utils/types';
+import { RolesService } from '../roles/roles.service';
 
 describe('ProductosController', () => {
   let controller: ProductosController;
   let service: ProductosService;
   let orm: MikroORM;
+
   beforeAll(async () => {
     const config = defineConfig({
       dbName: 'test',
@@ -34,6 +35,12 @@ describe('ProductosController', () => {
             findOne: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
+          },
+        },
+        {
+          provide: RolesService,
+          useValue: {
+            findOne: jest.fn(),
           },
         },
       ],
@@ -92,7 +99,7 @@ describe('ProductosController', () => {
       });
       jest.spyOn(service, 'create').mockResolvedValue(result);
       const req: CustomRequest = {
-        user: { id: '1', role: 'user' },
+        user: '1',
       } as CustomRequest;
 
       expect(
@@ -123,7 +130,7 @@ describe('ProductosController', () => {
 
       jest.spyOn(service, 'update').mockResolvedValue(updatedResult);
       const req: CustomRequest = {
-        user: { id: '1', role: 'user' },
+        user: '1',
       } as CustomRequest;
 
       expect(

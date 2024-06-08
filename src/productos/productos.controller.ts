@@ -33,7 +33,7 @@ export class ProductosController {
     @Body() productoData: ProductosCreateDto,
     @Req() req: CustomRequest,
   ) {
-    return await this.productosService.create(productoData, req.user.id);
+    return await this.productosService.create(productoData, req.user);
   }
 
   @Put('/:id')
@@ -42,6 +42,6 @@ export class ProductosController {
     @Body() productoData: ProductoUpdateDto,
     @Req() req: CustomRequest,
   ) {
-    return await this.productosService.update(id, productoData, req.user.id);
+    return await this.productosService.update(id, productoData, req.user);
   }
 }

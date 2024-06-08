@@ -1,21 +1,17 @@
-import { EntityManager, wrap } from '@mikro-orm/mongodb';
+import { EntityManager } from '@mikro-orm/mongodb';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { Productos } from '../entities/productos.entity';
-import { ERROR_MESSAGES } from '../utils/constants';
-import { ProductosCreateDto } from './dto/productosCreate.dto';
-import { User } from '../entities/user.entity';
 import { Insumos } from '../entities/insumos.entity';
-import { InsumosService } from '../insumos/insumos.service';
+import { Productos } from '../entities/productos.entity';
+import { User } from '../entities/user.entity';
+import { ERROR_MESSAGES } from '../utils/constants';
 import { ProductoUpdateDto } from './dto/producto.update';
+import { ProductosCreateDto } from './dto/productosCreate.dto';
 
 @Injectable()
 export class ProductosService {
   logger = new Logger(ProductosService.name);
 
-  constructor(
-    private readonly em: EntityManager,
-    private readonly insumosSerivice: InsumosService,
-  ) {}
+  constructor(private readonly em: EntityManager) {}
   async find() {
     return await this.em.fork().find(Productos, {});
   }
@@ -65,7 +61,7 @@ export class ProductosService {
 
       const producto = await this.em.fork().findOneOrFail(Productos, { id });
 
-      this.em.assign(producto, ProductoUpdateDto as Partial<User>, {
+      this.em.assign(producto, productoData as Partial<User>, {
         mergeObjectProperties: true,
       });
 

@@ -7,6 +7,7 @@ import { mockedEm } from './__mocks__/em.mock';
 import { User } from '../entities/user.entity';
 import { ERROR_MESSAGES } from '../utils/constants';
 import { ProductoUpdateDto } from './dto/producto.update';
+import { Roles } from '../entities/roles.entity';
 
 describe('ProductosService', () => {
   let service: ProductosService;
@@ -95,9 +96,14 @@ describe('ProductosService', () => {
         video_path: 'test',
       });
 
+      const adminRole = orm.em.create(Roles, {
+        name: 'admin',
+        permissions: [],
+      });
+
       const admin = orm.em.create(User, {
         email: 'test',
-        role: 'admin',
+        role: adminRole,
       });
 
       const productoData = {
@@ -148,8 +154,11 @@ describe('ProductosService', () => {
 
       const userMock = orm.em.create(User, {
         email: 'test',
-        role: 'admin',
-        name: 'test',
+        name: 'admin',
+        role: orm.em.create(Roles, {
+          name: 'admin',
+          permissions: [],
+        }),
       });
 
       jest.spyOn(em, 'findOneOrFail').mockResolvedValueOnce(userMock);

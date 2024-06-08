@@ -1,14 +1,26 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
-import { JWTPayload } from 'src/utils/types';
+import { RolesService } from '../roles/roles.service';
+import { CustomRequest, EPermissionContext, JWTPayload } from '../utils/types';
 require('dotenv').config();
 
+enum MapMethodToAction {
+  GET = 'read',
+  POST = 'create',
+  PUT = 'update',
+  DELETE = 'delete',
+}
+@Injectable()
 export class AuthGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest();
+  constructor(private readonly rolesService: RolesService) {}
+  private logger = new Logger(AuthGuard.name);
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request: CustomRequest = context.switchToHttp().getRequest();
 
     const isPublic = Reflect.getMetadata('public', context.getHandler());
     if (isPublic) {
@@ -18,28 +30,43 @@ export class AuthGuard implements CanActivate {
     if (!request.headers.authorization) {
       return false;
     }
-    const roles = Reflect.getMetadata('roles', context.getHandler());
+    const [_, token] = request.headers.authorization.split(' ');
 
-    try {
-      const [_, token] = request.headers.authorization.split(' ');
+    const { id, roleId } = verify(token, process.env.JWT_SECRET) as JWTPayload;
 
-      const { id, role } = verify(token, process.env.JWT_SECRET) as JWTPayload;
-
-      if (!roles || roles.length === 0) {
-        request.user = { id, role };
-        return request;
-      }
-
-      if (!roles.includes(role)) {
-        return false;
-      }
-
-      request.user = { id, role };
-
-      return request;
-    } catch (error) {
-      console.log('Valio queso la autenticacion');
+    if (!id || !roleId) {
+      this.logger.error('Error en el token, invalido o alterado');
       return false;
     }
+
+    const userRole = await this.rolesService.findOne(roleId);
+
+    const contexto = Object.values(EPermissionContext).find((value) =>
+      request.url.includes(value),
+    );
+
+    //logica para verificar si el usuario tiene el rol necesario dpendiendo el metodo y la ruta
+
+    if (!contexto) {
+      return false;
+    }
+
+    const permiso = userRole.permissions.find(
+      (permission) =>
+        permission.context === contexto &&
+        permission.action === MapMethodToAction[request.method],
+    );
+
+    if (!permiso) {
+      return false;
+    }
+
+    request.user = id;
+
+    return true;
+  }
+  catch(error) {
+    this.logger.error('Error en la autenticación', error.message);
+    return false;
   }
 }
