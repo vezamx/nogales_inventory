@@ -53,8 +53,9 @@ export class AuthGuard implements CanActivate {
 
     const permiso = userRole.permissions.find(
       (permission) =>
-        permission.context === contexto &&
-        permission.action === MapMethodToAction[request.method],
+        (permission.context === contexto &&
+          permission.action === MapMethodToAction[request.method]) ||
+        permission.action === 'all',
     );
 
     if (!permiso) {

@@ -74,13 +74,25 @@ export class RolesService {
       throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
     }
 
-    const uniquePermissions = permissions.filter((permission) => {
-      if (!role.permissions.includes(permission)) {
-        role.permissions.push(permission);
-      }
-    });
+    const auxPermissions = [...role.permissions, ...permissions];
 
-    role.permissions = [...role.permissions, ...uniquePermissions];
+    const uniquePermissions = _.uniqWith(auxPermissions, _.isEqual);
+
+    role.permissions = uniquePermissions;
+
+    //Check if any of the permissions is action="all" and remove all the other permissions that have the proerty context equal to the context
+
+    const allPermissions = uniquePermissions.filter(
+      (permission) => permission.action === 'all',
+    );
+
+    if (allPermissions.length > 0) {
+      const context = allPermissions[0].context;
+      role.permissions = role.permissions.filter(
+        (permission) =>
+          permission.context !== context || permission.action === 'all',
+      );
+    }
 
     await this.em.persistAndFlush(role);
 
