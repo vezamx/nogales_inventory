@@ -4,12 +4,14 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { RolesCreateDto } from './dto/rolesCreate.dto';
 import { RolesService } from './roles.service';
 import { AuthGuard } from '../guards/authentication.guard';
+import { addPermissionToRoleDto } from './dto/rolesUpdate.dto';
 
 @UseGuards(AuthGuard)
 @Controller('roles')
@@ -29,6 +31,14 @@ export class RolesController {
   @Post('/')
   async create(@Body() data: RolesCreateDto) {
     return this.rolesService.create(data);
+  }
+
+  @Patch('/:id')
+  async addPermissionToRole(
+    @Param('id') id: string,
+    @Body() { permissions }: addPermissionToRoleDto,
+  ) {
+    return this.rolesService.addPermissionToRole(id, permissions);
   }
 
   @Delete('/:id')

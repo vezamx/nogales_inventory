@@ -14,6 +14,7 @@ enum MapMethodToAction {
   POST = 'create',
   PUT = 'update',
   DELETE = 'delete',
+  PATCH = 'update',
 }
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -45,17 +46,15 @@ export class AuthGuard implements CanActivate {
       request.url.includes(value),
     );
 
-    //logica para verificar si el usuario tiene el rol necesario dpendiendo el metodo y la ruta
-
     if (!contexto) {
       return false;
     }
 
     const permiso = userRole.permissions.find(
       (permission) =>
-        (permission.context === contexto &&
-          permission.action === MapMethodToAction[request.method]) ||
-        permission.action === 'all',
+        permission.context === contexto &&
+        (permission.action === MapMethodToAction[request.method] ||
+          permission.action === 'all'),
     );
 
     if (!permiso) {
