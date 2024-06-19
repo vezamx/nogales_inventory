@@ -1,17 +1,23 @@
-import { Collection, Entity, Enum, ManyToMany } from '@mikro-orm/core';
+import { ArrayType, Entity, Enum, ManyToOne, Property } from '@mikro-orm/core';
 import { BaseEntityData } from './base';
+import {
+  EPermissionAction,
+  EPermissionContext,
+  TPermissionAction,
+} from '../utils/types';
+import { User } from './user.entity';
 
-enum ETipoTransaccion {
-  INGRESO = 'INGRESO',
-  EGRESO = 'EGRESO',
-  AJUSTE = 'AJUSTE',
-}
-export type TTipoTransaccion = `${ETipoTransaccion}`;
 @Entity()
 export class Transactions extends BaseEntityData {
-  @Enum({ items: () => ETipoTransaccion, default: ETipoTransaccion.AJUSTE })
-  tipoTransaccion: TTipoTransaccion;
+  @Enum({ items: () => EPermissionAction })
+  tipoTransaccion: TPermissionAction;
 
-  @ManyToMany(() => Transactions)
-  productosAfectados = new Collection<Transactions>(this);
+  @Property({ type: ArrayType })
+  elementosAfectados: string[];
+
+  @Enum({ items: () => EPermissionContext })
+  contexto: `${EPermissionContext}`;
+
+  @ManyToOne(() => User)
+  createdBy: User;
 }

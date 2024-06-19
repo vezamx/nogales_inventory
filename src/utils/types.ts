@@ -14,6 +14,7 @@ export enum EPermissionContext {
   PERMISSIONS = 'permissions',
   INSUMOS = 'insumos',
   PRODUCTOS = 'productos',
+  TRANSACCIONES = 'transacciones',
 }
 export enum EPermissionAction {
   CREATE = 'create',
