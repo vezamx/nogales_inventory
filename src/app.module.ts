@@ -6,6 +6,7 @@ import { ProductosModule } from './productos/productos.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { RolesService } from './roles/roles.service';
+import { TransactionsModule } from './transactions/transactions.module';
 @Module({
   imports: [
     MikroOrmModule.forRoot(),
@@ -14,6 +15,7 @@ import { RolesService } from './roles/roles.service';
     UsersModule,
     InsumosModule,
     ProductosModule,
+    TransactionsModule,
   ],
   providers: [RolesService],
 })
