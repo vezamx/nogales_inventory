@@ -11,10 +11,14 @@ import { InsumoCreateDto } from './dto/insumoCreate.dto';
 import { InsumoUpdateDto } from './dto/insumoUpdate.dto';
 import { ERROR_MESSAGES, MODELS } from '../utils/constants';
 import { FormatResourceChangeMessage } from '../utils/messageFormatter';
+import { TransactionsService } from '../transactions/transactions.service';
 
 @Injectable()
 export class InsumosService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly transactionsService: TransactionsService,
+  ) {}
 
   private logger = new Logger('InsumosService');
 
@@ -36,7 +40,11 @@ export class InsumosService {
       const insumo = this.em.create(Insumos, insumoData);
       await this.em.persistAndFlush(insumo);
 
-      //TODO: Implementar el servicio de transacciones para llevar un control de los movimientos de los insumos
+      await this.transactionsService.create({
+        contexto: 'insumos',
+        tipoTransaccion: 'create',
+        elementosAfectados: [insumo.id],
+      });
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'create'));
 
       return insumo;
@@ -69,7 +77,12 @@ export class InsumosService {
       }
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
       await this.em.persistAndFlush(insumo);
-      //TODO: Implementar ek servicio de transacciones para llevar un control de los movimientos de los insumos
+
+      await this.transactionsService.create({
+        contexto: 'insumos',
+        tipoTransaccion: 'update',
+        elementosAfectados: [insumo.id],
+      });
       return insumo;
     } catch (error) {
       this.logger.error(error.message);
@@ -80,10 +93,5 @@ export class InsumosService {
         throw error;
       } else throw new InternalServerErrorException(error.message);
     }
-  }
-
-  async dropProductInsumos(idProducto: string) {
-    this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
-    return `Restando insumos del producto con id: ${idProducto}`;
   }
 }
