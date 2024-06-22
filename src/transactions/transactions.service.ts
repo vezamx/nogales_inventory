@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/mongodb';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Transactions } from 'src/entities/transactions.entity';
 import { TransactionsCreateDto } from './dto/transactionsCreate.dto';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class TransactionsService {
@@ -20,9 +21,19 @@ export class TransactionsService {
     return transaction;
   }
 
-  async create(data: TransactionsCreateDto) {
+  async create(data: TransactionsCreateDto, userId: string) {
     try {
+      const user = await this.em.findOne(User, {
+        id: userId,
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with id ${userId} not found`);
+      }
+
       const transaction = this.em.create(Transactions, data);
+
+      transaction.createdBy = user;
       await this.em.persistAndFlush(transaction);
       return transaction;
     } catch (error) {

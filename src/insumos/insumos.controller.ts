@@ -1,12 +1,27 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { InsumoCreateDto } from './dto/insumoCreate.dto';
 import { InsumoUpdateDto } from './dto/insumoUpdate.dto';
 import { InsumosService } from './insumos.service';
+import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
+import { AuthGuard } from '../guards/authentication.guard';
+import { NotTransactable } from '../decorators/notTransactable.decorator';
 
+@UseGuards(AuthGuard)
+@UseInterceptors(TransactionsInterceptor)
 @Controller('insumos')
 export class InsumosController {
   constructor(private readonly insumosService: InsumosService) {}
 
+  @NotTransactable()
   @Get()
   async find() {
     return await this.insumosService.find();

@@ -1,14 +1,12 @@
-import { IsArray, IsEnum, IsString } from 'class-validator';
-import { EPermissionAction, EPermissionContext } from 'src/utils/types';
+import { IsString } from 'class-validator';
 
 export class TransactionsCreateDto {
-  @IsEnum(EPermissionAction)
-  tipoTransaccion: `${EPermissionAction}`;
+  @IsString()
+  method: string;
 
-  @IsArray()
-  @IsString({ each: true })
-  elementosAfectados: string[];
+  @IsString()
+  url: string;
 
-  @IsEnum(EPermissionContext)
-  contexto: `${EPermissionContext}`;
+  @IsString()
+  body: string;
 }

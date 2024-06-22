@@ -1,7 +1,15 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from 'src/guards/authentication.guard';
+import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
 
+@UseInterceptors(TransactionsInterceptor)
 @UseGuards(AuthGuard)
 @Controller('transactions')
 export class TransactionsController {

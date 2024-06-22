@@ -7,17 +7,22 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RolesCreateDto } from './dto/rolesCreate.dto';
 import { RolesService } from './roles.service';
 import { AuthGuard } from '../guards/authentication.guard';
 import { addPermissionToRoleDto } from './dto/rolesUpdate.dto';
+import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
+import { NotTransactable } from '../decorators/notTransactable.decorator';
 
+@UseInterceptors(TransactionsInterceptor)
 @UseGuards(AuthGuard)
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
+  @NotTransactable()
   @Get('/')
   async find() {
     return this.rolesService.find();

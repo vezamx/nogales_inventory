@@ -11,14 +11,10 @@ import { InsumoCreateDto } from './dto/insumoCreate.dto';
 import { InsumoUpdateDto } from './dto/insumoUpdate.dto';
 import { ERROR_MESSAGES, MODELS } from '../utils/constants';
 import { FormatResourceChangeMessage } from '../utils/messageFormatter';
-import { TransactionsService } from '../transactions/transactions.service';
 
 @Injectable()
 export class InsumosService {
-  constructor(
-    private readonly em: EntityManager,
-    private readonly transactionsService: TransactionsService,
-  ) {}
+  constructor(private readonly em: EntityManager) {}
 
   private logger = new Logger('InsumosService');
 
@@ -40,11 +36,6 @@ export class InsumosService {
       const insumo = this.em.create(Insumos, insumoData);
       await this.em.persistAndFlush(insumo);
 
-      await this.transactionsService.create({
-        contexto: 'insumos',
-        tipoTransaccion: 'create',
-        elementosAfectados: [insumo.id],
-      });
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'create'));
 
       return insumo;
@@ -78,11 +69,6 @@ export class InsumosService {
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
       await this.em.persistAndFlush(insumo);
 
-      await this.transactionsService.create({
-        contexto: 'insumos',
-        tipoTransaccion: 'update',
-        elementosAfectados: [insumo.id],
-      });
       return insumo;
     } catch (error) {
       this.logger.error(error.message);
