@@ -4,6 +4,8 @@ import { RolesService } from './roles.service';
 import { MikroORM, defineConfig } from '@mikro-orm/mongodb';
 import { Roles } from '../entities/roles.entity';
 import { TransactionsService } from '../transactions/transactions.service';
+import { TPermission } from '../utils/types';
+import { addPermissionToRoleDto } from './dto/rolesUpdate.dto';
 
 describe('RolesController', () => {
   let controller: RolesController;
@@ -33,6 +35,7 @@ describe('RolesController', () => {
             findOne: jest.fn(),
             create: jest.fn(),
             delete: jest.fn(),
+            addPermissionToRole: jest.fn(),
           },
         },
         {
@@ -79,6 +82,28 @@ describe('RolesController', () => {
       });
       jest.spyOn(service, 'create').mockResolvedValueOnce(roleMock);
       const role = await controller.create(roleMock);
+      expect(role).toEqual(roleMock);
+    });
+  });
+
+  describe('addPermissionToRole', () => {
+    it('should add a permission to a role', async () => {
+      const roleMock = orm.em.create(Roles, {
+        name: 'admin',
+        permissions: [],
+      });
+
+      const permissionsToAdd: TPermission[] = [
+        { context: 'users', action: 'all' },
+      ];
+
+      const data: addPermissionToRoleDto = {
+        permissions: permissionsToAdd,
+      };
+      jest
+        .spyOn(service, 'addPermissionToRole')
+        .mockResolvedValueOnce(roleMock);
+      const role = await controller.addPermissionToRole('1', data);
       expect(role).toEqual(roleMock);
     });
   });
