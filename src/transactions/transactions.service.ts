@@ -1,8 +1,8 @@
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Transactions } from 'src/entities/transactions.entity';
+import { Transactions } from '../entities/transactions.entity';
 import { TransactionsCreateDto } from './dto/transactionsCreate.dto';
-import { User } from 'src/entities/user.entity';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class TransactionsService {

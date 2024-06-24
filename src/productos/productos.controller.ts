@@ -15,7 +15,7 @@ import { ProductosCreateDto } from './dto/productosCreate.dto';
 import { CustomRequest } from '../utils/types';
 import { ProductoUpdateDto } from './dto/producto.update';
 import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
-import { NotTransactable } from 'src/decorators/notTransactable.decorator';
+import { NotTransactable } from '../decorators/notTransactable.decorator';
 
 @UseGuards(AuthGuard)
 @UseInterceptors(TransactionsInterceptor)

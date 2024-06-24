@@ -4,9 +4,9 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { TransactionsService } from 'src/transactions/transactions.service';
+import { TransactionsService } from '../transactions/transactions.service';
 import { tap } from 'rxjs/operators';
-import { CustomRequest } from 'src/utils/types';
+import { CustomRequest } from '../utils/types';
 
 @Injectable()
 export class TransactionsInterceptor implements NestInterceptor {

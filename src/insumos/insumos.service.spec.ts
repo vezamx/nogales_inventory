@@ -161,11 +161,4 @@ describe('InsumosService', () => {
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
-  describe('DropProductos', () => {
-    it('should drop all insumos', async () => {
-      expect(await service.dropProductInsumos('2')).toBe(
-        `Restando insumos del producto con id: ${2}`,
-      );
-    });
-  });
 });

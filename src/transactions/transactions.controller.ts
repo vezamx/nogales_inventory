@@ -6,7 +6,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
-import { AuthGuard } from 'src/guards/authentication.guard';
+import { AuthGuard } from '../guards/authentication.guard';
 import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
 
 @UseInterceptors(TransactionsInterceptor)
