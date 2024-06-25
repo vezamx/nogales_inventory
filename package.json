@@ -85,7 +85,8 @@
       "!**/*.dto.(t|j)s",
       "!**/*.decorator.(t|j)s",
       "!**/*.guard.(t|j)s",
-      "!**/*.interceptor.(t|j)s"
+      "!**/*.interceptor.(t|j)s",
+      "!**/*.seeder.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
