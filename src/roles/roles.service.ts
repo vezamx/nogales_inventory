@@ -74,13 +74,18 @@ export class RolesService {
       throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
     }
 
-    const uniquePermissions = permissions.filter((permission) => {
-      if (!role.permissions.includes(permission)) {
-        role.permissions.push(permission);
-      }
-    });
+    permissions.forEach((permission) => {
+      if (permission.action !== 'all')
+      role.permissions.push(permission);
+    else {
+      role.permissions = role.permissions.filter(
+        (p) =>! (permission.context === p.context && p.action !== 'all'),
+      );
+      role.permissions.push(permission);
+    }
 
-    role.permissions = [...role.permissions, ...uniquePermissions];
+    } );
+    
 
     await this.em.persistAndFlush(role);
 

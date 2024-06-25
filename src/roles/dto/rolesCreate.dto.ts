@@ -1,4 +1,16 @@
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import {
+  EPermissionAction,
+  EPermissionContext,
+  TPermissionAction,
+  TPermissionContext,
+} from '../../utils/types';
 
 export class RolesCreateDto {
   @IsString()
@@ -10,10 +22,10 @@ export class RolesCreateDto {
   permissions?: PermissionDto[];
 }
 
-class PermissionDto {
-  @IsString()
-  context: string;
+export class PermissionDto {
+  @IsEnum(EPermissionContext)
+  context: TPermissionContext;
 
-  @IsString()
-  action: string;
+  @IsEnum(EPermissionAction)
+  action: TPermissionAction;
 }

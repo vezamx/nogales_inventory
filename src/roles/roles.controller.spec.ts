@@ -3,11 +3,14 @@ import { RolesController } from './roles.controller';
 import { RolesService } from './roles.service';
 import { MikroORM, defineConfig } from '@mikro-orm/mongodb';
 import { Roles } from '../entities/roles.entity';
+import { TransactionsService } from '../transactions/transactions.service';
+import { TPermission } from '../utils/types';
+import { addPermissionToRoleDto } from './dto/rolesUpdate.dto';
 
 describe('RolesController', () => {
   let controller: RolesController;
   let service: RolesService;
-  let orm: MikroORM
+  let orm: MikroORM;
 
   beforeAll(async () => {
     const config = defineConfig({
@@ -21,7 +24,6 @@ describe('RolesController', () => {
     orm = await MikroORM.init(config);
   });
 
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RolesController],
@@ -33,7 +35,12 @@ describe('RolesController', () => {
             findOne: jest.fn(),
             create: jest.fn(),
             delete: jest.fn(),
+            addPermissionToRole: jest.fn(),
           },
+        },
+        {
+          provide: TransactionsService,
+          useValue: {},
         },
       ],
     }).compile();
@@ -57,12 +64,12 @@ describe('RolesController', () => {
   describe('findOne', () => {
     it('should return a role', async () => {
       const roleMock = orm.em.create(Roles, {
-        name: "admin",
-        permissions: []
-      })
+        name: 'admin',
+        permissions: [],
+      });
 
       jest.spyOn(service, 'findOne').mockResolvedValueOnce(roleMock);
-      const role = await controller.findOne("1");
+      const role = await controller.findOne('1');
       expect(role).toEqual(roleMock);
     });
   });
@@ -70,11 +77,33 @@ describe('RolesController', () => {
   describe('create', () => {
     it('should create a role', async () => {
       const roleMock = orm.em.create(Roles, {
-        name: "admin",
-        permissions: []
-      })
+        name: 'admin',
+        permissions: [],
+      });
       jest.spyOn(service, 'create').mockResolvedValueOnce(roleMock);
       const role = await controller.create(roleMock);
+      expect(role).toEqual(roleMock);
+    });
+  });
+
+  describe('addPermissionToRole', () => {
+    it('should add a permission to a role', async () => {
+      const roleMock = orm.em.create(Roles, {
+        name: 'admin',
+        permissions: [],
+      });
+
+      const permissionsToAdd: TPermission[] = [
+        { context: 'users', action: 'all' },
+      ];
+
+      const data: addPermissionToRoleDto = {
+        permissions: permissionsToAdd,
+      };
+      jest
+        .spyOn(service, 'addPermissionToRole')
+        .mockResolvedValueOnce(roleMock);
+      const role = await controller.addPermissionToRole('1', data);
       expect(role).toEqual(roleMock);
     });
   });
@@ -82,13 +111,12 @@ describe('RolesController', () => {
   describe('delete', () => {
     it('should delete a role', async () => {
       const roleMock = orm.em.create(Roles, {
-        name: "admin",
-        permissions: []
-      })
-      jest.spyOn(service, 'delete').mockResolvedValueOnce(roleMock)
-      const role = await controller.delete("1");
+        name: 'admin',
+        permissions: [],
+      });
+      jest.spyOn(service, 'delete').mockResolvedValueOnce(roleMock);
+      const role = await controller.delete('1');
       expect(role).toEqual(roleMock);
     });
-  }
-  );
+  });
 });

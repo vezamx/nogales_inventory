@@ -195,6 +195,27 @@ describe('RolesService', () => {
         expect(error).toBeInstanceOf(NotFoundException);
       }
     });
+
+    it("Should replace existing permission if the action of the upcoming permission has 'all' as action", async () => {
+      const roleMock: Roles = orm.em.create(Roles, {
+        name: 'admin',
+        permissions: [
+          {
+            context: 'users',
+            action: 'read',
+          },
+        ],
+      });
+      jest.spyOn(em, 'findOne').mockResolvedValue(roleMock);
+      const role = await service.addPermissionToRole('1', [
+        {
+          context: 'users',
+          action: 'all',
+        },
+      ]);
+      expect(role.permissions).toHaveLength(1);
+      expect(role.permissions[0].action).toBe('all');
+    });
   });
 
   describe('removePermissionFromRole', () => {

@@ -6,6 +6,7 @@ import { Productos } from '../entities/productos.entity';
 import { ProductosController } from './productos.controller';
 import { ProductosService } from './productos.service';
 import { RolesService } from '../roles/roles.service';
+import { TransactionsService } from '../transactions/transactions.service';
 
 describe('ProductosController', () => {
   let controller: ProductosController;
@@ -42,6 +43,14 @@ describe('ProductosController', () => {
           useValue: {
             findOne: jest.fn(),
           },
+        },
+        {
+          provide: RolesService,
+          useValue: {},
+        },
+        {
+          provide: TransactionsService,
+          useValue: {},
         },
       ],
     }).compile();

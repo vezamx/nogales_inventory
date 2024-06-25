@@ -6,6 +6,7 @@ import { User } from '../entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { RolesService } from '../roles/roles.service';
+import { TransactionsService } from '../transactions/transactions.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -42,6 +43,10 @@ describe('UsersController', () => {
           useValue: {
             findOne: jest.fn(),
           },
+        },
+        {
+          provide: TransactionsService,
+          useValue: {},
         },
       ],
     }).compile();

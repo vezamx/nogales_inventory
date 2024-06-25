@@ -8,6 +8,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InsumoUpdateDto } from './dto/insumoUpdate.dto';
+import { RolesService } from '../roles/roles.service';
+import { TransactionsService } from '../transactions/transactions.service';
 
 describe('InsumosController', () => {
   let controller: InsumosController;
@@ -25,6 +27,14 @@ describe('InsumosController', () => {
             update: jest.fn(),
             dropProductInsumos: jest.fn(),
           },
+        },
+        {
+          provide: RolesService,
+          useValue: {},
+        },
+        {
+          provide: TransactionsService,
+          useValue: {},
         },
       ],
     }).compile();
@@ -137,15 +147,6 @@ describe('InsumosController', () => {
       await expect(controller.update('1', InsumoUpdateData)).rejects.toThrow(
         InternalServerErrorException,
       );
-    });
-  });
-
-  describe('dropProductInsumos', () => {
-    it('should drop the insumos of a product', async () => {
-      jest
-        .spyOn(service, 'dropProductInsumos')
-        .mockResolvedValue('Hello World');
-      expect(await controller.dropProductInsumos('1')).toBe('Hello World');
     });
   });
 });

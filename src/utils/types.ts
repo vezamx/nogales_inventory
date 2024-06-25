@@ -14,6 +14,7 @@ export enum EPermissionContext {
   PERMISSIONS = 'permissions',
   INSUMOS = 'insumos',
   PRODUCTOS = 'productos',
+  TRANSACTIONS = 'transactions',
 }
 export enum EPermissionAction {
   CREATE = 'create',
@@ -22,8 +23,9 @@ export enum EPermissionAction {
   DELETE = 'delete',
   ALL = 'all',
 }
-
+export type TPermissionContext = `${EPermissionContext}`;
+export type TPermissionAction = `${EPermissionAction}`;
 export type TPermission = {
-  context: `${EPermissionContext}`;
-  action: `${EPermissionAction}`;
+  context: TPermissionContext;
+  action: TPermissionAction;
 };

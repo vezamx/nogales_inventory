@@ -36,7 +36,6 @@ export class InsumosService {
       const insumo = this.em.create(Insumos, insumoData);
       await this.em.persistAndFlush(insumo);
 
-      //TODO: Implementar el servicio de transacciones para llevar un control de los movimientos de los insumos
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'create'));
 
       return insumo;
@@ -69,7 +68,7 @@ export class InsumosService {
       }
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
       await this.em.persistAndFlush(insumo);
-      //TODO: Implementar ek servicio de transacciones para llevar un control de los movimientos de los insumos
+
       return insumo;
     } catch (error) {
       this.logger.error(error.message);
@@ -80,10 +79,5 @@ export class InsumosService {
         throw error;
       } else throw new InternalServerErrorException(error.message);
     }
-  }
-
-  async dropProductInsumos(idProducto: string) {
-    this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
-    return `Restando insumos del producto con id: ${idProducto}`;
   }
 }

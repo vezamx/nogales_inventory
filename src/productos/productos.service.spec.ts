@@ -8,6 +8,8 @@ import { User } from '../entities/user.entity';
 import { ERROR_MESSAGES } from '../utils/constants';
 import { ProductoUpdateDto } from './dto/producto.update';
 import { Roles } from '../entities/roles.entity';
+import { RolesService } from '../roles/roles.service';
+import { TransactionsService } from '../transactions/transactions.service';
 
 describe('ProductosService', () => {
   let service: ProductosService;
@@ -39,6 +41,8 @@ describe('ProductosService', () => {
           },
         },
         { provide: InsumosService, useValue: {} },
+        { provide: RolesService, useValue: {} },
+        { provide: TransactionsService, useValue: {} },
       ],
     }).compile();
 
