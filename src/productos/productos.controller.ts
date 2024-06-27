@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Req,
@@ -49,5 +50,10 @@ export class ProductosController {
     @Req() req: CustomRequest,
   ) {
     return await this.productosService.update(id, productoData, req.user);
+  }
+
+  @Patch('/:id')
+  async sellProducto(@Param('id') id: string) {
+    return await this.productosService.sellProduct(id);
   }
 }
