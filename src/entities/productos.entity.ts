@@ -11,6 +11,7 @@ import {
 import { BaseEntityData } from './base';
 import { Insumos } from './insumos.entity';
 import { User } from './user.entity';
+import { SimpleBaseData } from './simplifiedBase';
 @Entity()
 export class Productos extends BaseEntityData {
   @Property()
@@ -44,7 +45,7 @@ export class Productos extends BaseEntityData {
 }
 
 @Entity()
-export class Productos_Ingredientes extends BaseEntityData {
+export class Productos_Ingredientes extends SimpleBaseData {
   @OneToOne(() => Insumos)
   insumo: Insumos;
 
