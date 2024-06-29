@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { RolesService } from './roles/roles.service';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ComandasModule } from './comandas/comandas.module';
+import { ComandaTicketsModule } from './comanda_tickets/comanda_tickets.module';
 @Module({
   imports: [
     MikroOrmModule.forRoot(),
@@ -18,6 +19,7 @@ import { ComandasModule } from './comandas/comandas.module';
     ProductosModule,
     TransactionsModule,
     ComandasModule,
+    ComandaTicketsModule,
   ],
   providers: [RolesService],
 })

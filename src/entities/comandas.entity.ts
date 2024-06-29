@@ -12,7 +12,7 @@ import { Productos } from './productos.entity';
 import { User } from './user.entity';
 import { SimpleBaseData } from './simplifiedBase';
 
-enum EStatusComanda {
+export enum EStatusComanda {
   ABIERTA = 'abierta',
   TERMINADA_PAGADA = 'terminada_pagada',
   TERMINADA_PENDIENTE_PAGO = 'terminada_pendiente_pago',
@@ -20,6 +20,21 @@ enum EStatusComanda {
 }
 
 export type TStatusComanda = `${EStatusComanda}`;
+
+@Entity()
+export class Comanda_Descuento extends SimpleBaseData {
+  @Property()
+  descuento: number;
+
+  @Property({ default: false })
+  isPercent: boolean;
+
+  @Property()
+  motivo: string;
+
+  @OneToOne(() => User)
+  approbedBy: User;
+}
 
 @Entity()
 export class Comanda extends BaseEntityData {
@@ -32,6 +47,9 @@ export class Comanda extends BaseEntityData {
   @Enum({ items: () => EStatusComanda, default: EStatusComanda.ABIERTA })
   status: TStatusComanda;
 
+  @OneToOne(() => Comanda_Descuento, { nullable: true })
+  descuento?: Comanda_Descuento;
+
   @ManyToOne(() => User)
   createdBy: User;
 
@@ -40,34 +58,13 @@ export class Comanda extends BaseEntityData {
 }
 
 @Entity()
-export class Comanda_Tickets extends SimpleBaseData {
+export class Comanda_Tickets extends BaseEntityData {
   @OneToOne(() => Comanda)
   comanda: Comanda;
 
   @Property()
   subtotal: number;
 
-  @OneToOne(() => Comanta_Tickets_Descuento, { nullable: true })
-  descuento?: Comanta_Tickets_Descuento;
-
   @Property()
   total: number;
-}
-
-@Entity()
-export class Comanta_Tickets_Descuento extends SimpleBaseData {
-  @OneToOne(() => Comanda_Tickets)
-  comanda_ticket: Comanda_Tickets;
-
-  @Property()
-  descuento: number;
-
-  @Property({ default: false })
-  isPercent: boolean;
-
-  @Property()
-  motivo: string;
-
-  @OneToOne(() => User)
-  approbedBy: User;
 }

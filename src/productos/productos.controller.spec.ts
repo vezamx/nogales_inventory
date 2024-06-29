@@ -1,18 +1,20 @@
 import { MikroORM, defineConfig } from '@mikro-orm/mongodb';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustomRequest } from 'src/utils/types';
+import { CustomRequest } from '../utils/types';
 import { Productos } from '../entities/productos.entity';
 import { ProductosController } from './productos.controller';
 import { ProductosService } from './productos.service';
 import { RolesService } from '../roles/roles.service';
 import { TransactionsService } from '../transactions/transactions.service';
+import { User } from '../entities/user.entity';
+import { Roles } from '../entities/roles.entity';
 
 describe('ProductosController', () => {
   let controller: ProductosController;
   let service: ProductosService;
   let orm: MikroORM;
-
+  let mockUser: User;
   beforeAll(async () => {
     const config = defineConfig({
       dbName: 'test',
@@ -57,6 +59,16 @@ describe('ProductosController', () => {
 
     controller = module.get<ProductosController>(ProductosController);
     service = module.get<ProductosService>(ProductosService);
+
+    //Mock a user
+    mockUser = orm.em.create(User, {
+      email: 'test@test.com',
+      name: 'admin',
+      role: orm.em.create(Roles, {
+        name: 'admin',
+        permissions: [{ context: 'productos', action: 'all' }],
+      }),
+    });
   });
 
   it('should be defined', () => {
@@ -71,6 +83,7 @@ describe('ProductosController', () => {
           costo: 10,
           photo_path: 'test',
           video_path: 'test',
+          insumos: [],
         }),
       ];
       jest.spyOn(service, 'find').mockResolvedValue(result);
@@ -81,15 +94,17 @@ describe('ProductosController', () => {
 
   describe('findOne', () => {
     it('should return a product', async () => {
-      const result = orm.em.fork().create(Productos, {
+      const Product = orm.em.fork().create(Productos, {
         nombre: 'test',
         costo: 10,
         photo_path: 'test',
         video_path: 'test',
+        updatedBy: mockUser,
       });
-      jest.spyOn(service, 'findOne').mockResolvedValue(result);
 
-      expect(await controller.findOne('1')).toBe(result);
+      jest.spyOn(service, 'findOne').mockResolvedValue(Product);
+
+      expect(await controller.findOne('1')).toBe(Product);
     });
     it('should throw an error if the product does not exist', async () => {
       jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());

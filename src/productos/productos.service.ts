@@ -9,7 +9,7 @@ import { User } from '../entities/user.entity';
 import { ERROR_MESSAGES } from '../utils/constants';
 import { ProductoUpdateDto } from './dto/producto.update';
 import { ProductosCreateDto } from './dto/productosCreate.dto';
-import { InsumosService } from 'src/insumos/insumos.service';
+import { InsumosService } from '../insumos/insumos.service';
 
 @Injectable()
 export class ProductosService {
@@ -20,13 +20,13 @@ export class ProductosService {
     private readonly insumosService: InsumosService,
   ) {}
   async find() {
-    return await this.em.fork().find(Productos, {}, { populate: ['insumos'] });
+    return await this.em.fork().find(Productos, {});
   }
 
   async findOne(id: string) {
-    const producto = await this.em
-      .fork()
-      .findOne(Productos, { id }, { populate: ['insumos'] });
+    const producto = await this.em.fork().findOne(Productos, { id }, {});
+
+    await producto.insumos.init();
 
     if (!producto) {
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
