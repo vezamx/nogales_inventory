@@ -15,7 +15,7 @@ Localmente el proyecto lo puedes correr de diferentes formas, docker o mediante 
 Antes de construir o iniciar la aplicación mediante terminal necesitamos configurar las variables de entorno, para ello copiaremos el archivo .env.local y setearemos las variables que correspondan
 
 ```bash
-$ cp .env.local .env
+$ cp .env.example .env
 ```
 
 En caso de que no conozcas el valor para alguna env solicitalo en [discord](https://discord.gg/TdBCEjw3zH).
