@@ -65,6 +65,9 @@ export class Comanda_Tickets extends BaseEntityData {
   @Property()
   subtotal: number;
 
+  @Property({ nullable: true })
+  descuentos?: number;
+
   @Property()
   total: number;
 }

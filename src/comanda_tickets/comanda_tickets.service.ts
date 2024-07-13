@@ -23,6 +23,10 @@ export class ComandaTicketsService {
           : subTotal - comanda.descuento.descuento
         : subTotal;
 
+      const descuentos: number = comanda.descuento.isPercent
+        ? (subTotal * comanda.descuento.descuento) / 100
+        : comanda.descuento.descuento;
+
       for (let i = 0; i < comanda.productos.length; i++) {
         await this.productoService.sellProduct(comanda.productos[i].id);
       }
@@ -31,6 +35,7 @@ export class ComandaTicketsService {
         comanda,
         subtotal: subTotal,
         total,
+        descuentos,
       });
 
       await this.em.persistAndFlush(ticket);
