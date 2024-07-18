@@ -3,7 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
 import { User } from '../entities/user.entity';
 import { ERROR_MESSAGES } from '../utils/constants';
-import { JWTPayload } from 'src/utils/types';
+import { JWTPayload } from '../utils/types';
 require('dotenv').config();
 
 @Injectable()

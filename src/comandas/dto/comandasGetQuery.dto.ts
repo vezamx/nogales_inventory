@@ -1,5 +1,5 @@
 import { IsOptional, IsInt, IsPositive, IsEnum } from 'class-validator';
-import { EStatusComanda } from 'src/entities/comandas.entity';
+import { EStatusComanda } from '../../entities/comandas.entity';
 
 enum ESort {
   ASC = 'asc',

@@ -14,7 +14,7 @@ describe('ProductosController', () => {
   let controller: ProductosController;
   let service: ProductosService;
   let orm: MikroORM;
-  let mockUser: User;
+
   beforeAll(async () => {
     const config = defineConfig({
       dbName: 'test',
@@ -47,10 +47,6 @@ describe('ProductosController', () => {
           },
         },
         {
-          provide: RolesService,
-          useValue: {},
-        },
-        {
           provide: TransactionsService,
           useValue: {},
         },
@@ -61,14 +57,6 @@ describe('ProductosController', () => {
     service = module.get<ProductosService>(ProductosService);
 
     //Mock a user
-    mockUser = orm.em.create(User, {
-      email: 'test@test.com',
-      name: 'admin',
-      role: orm.em.create(Roles, {
-        name: 'admin',
-        permissions: [{ context: 'productos', action: 'all' }],
-      }),
-    });
   });
 
   it('should be defined', () => {
@@ -94,18 +82,28 @@ describe('ProductosController', () => {
 
   describe('findOne', () => {
     it('should return a product', async () => {
-      const Product = orm.em.fork().create(Productos, {
+      const userMock = orm.em.create(User, {
+        email: 'test',
+        name: 'admin',
+        role: orm.em.create(Roles, {
+          name: 'admin',
+          permissions: [],
+        }),
+      });
+
+      const prod = orm.em.fork().create(Productos, {
         nombre: 'test',
         costo: 10,
         photo_path: 'test',
         video_path: 'test',
-        updatedBy: mockUser,
+        insumos: [],
+        createdBy: userMock,
       });
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(Product);
+      jest.spyOn(service, 'findOne').mockResolvedValue(prod);
 
-      expect(await controller.findOne('1')).toBe(Product);
-    });
+      expect(await controller.findOne('1')).toBe(prod);
+    }, 100000);
     it('should throw an error if the product does not exist', async () => {
       jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
 

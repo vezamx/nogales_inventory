@@ -1,5 +1,5 @@
 import { Entity, Property } from '@mikro-orm/core';
-import { TPermission } from 'src/utils/types';
+import { TPermission } from '../utils/types';
 import { BaseEntityData } from './base';
 
 @Entity()

@@ -1,8 +1,8 @@
 import { EntityManager } from '@mikro-orm/mongodb';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Comanda, Comanda_Tickets } from 'src/entities/comandas.entity';
-import { ProductosService } from 'src/productos/productos.service';
-import { ERROR_MESSAGES } from 'src/utils/constants';
+import { Comanda, Comanda_Tickets } from '../entities/comandas.entity';
+import { ProductosService } from '../productos/productos.service';
+import { ERROR_MESSAGES } from '../utils/constants';
 
 @Injectable()
 export class ComandaTicketsService {

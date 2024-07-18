@@ -23,10 +23,10 @@ export class ProductosService {
     return await this.em.fork().find(Productos, {});
   }
 
-  async findOne(id: string) {
-    const producto = await this.em.fork().findOne(Productos, { id }, {});
-
-    await producto.insumos.init();
+  async findOne(id: string): Promise<Productos> {
+    const producto = await this.em
+      .fork()
+      .findOne(Productos, { id }, { populate: ['insumos'] });
 
     if (!producto) {
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
