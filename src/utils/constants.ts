@@ -8,6 +8,9 @@ export const ERROR_MESSAGES = {
   CONTENT_DUPLICATED: 'El contenido ya existe.',
   PRODUCT_NOT_FOUND: 'Producto no encontrado.',
   COMANDA_CLOSED: 'La comanda ya ha sido cerrada.',
+  MESA_HAS_COMANDAS: 'La mesa tiene comandas activas.',
+  WARNING_SECTIONS_DELETE:
+    'La sección fue eliminaram con exito, sin embargo, las mesas asignadas a esta seccion fueron eliminadas igualmente.',
 };
 
 export const MODELS = {

@@ -17,6 +17,7 @@ import { Productos } from '../entities/productos.entity';
 import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { ComandaTicketsService } from '../comanda_tickets/comanda_tickets.service';
+import { Mesa } from 'src/entities/mesa.entity';
 
 @Injectable()
 export class ComandasService {
@@ -55,8 +56,13 @@ export class ComandasService {
         throw new ForbiddenException(ERROR_MESSAGES.FORBIDDEN);
       }
 
+      const mesa = await this.em.findOne(Mesa, {
+        id: comandaData.mesaId,
+      });
+
       const comanda = this.em.create(Comanda, comandaData);
 
+      comanda.mesa = mesa;
       comanda.createdBy = user;
       comanda.updatedBy = user;
 

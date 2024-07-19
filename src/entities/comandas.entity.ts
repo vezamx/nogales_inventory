@@ -11,6 +11,7 @@ import { BaseEntityData } from './base';
 import { Productos } from './productos.entity';
 import { User } from './user.entity';
 import { SimpleBaseData } from './simplifiedBase';
+import { Mesa } from './mesa.entity';
 
 export enum EStatusComanda {
   ABIERTA = 'abierta',
@@ -46,6 +47,9 @@ export class Comanda extends BaseEntityData {
 
   @Enum({ items: () => EStatusComanda, default: EStatusComanda.ABIERTA })
   status: TStatusComanda;
+
+  @OneToOne({ entity: () => Mesa, owner: true })
+  mesa: Mesa;
 
   @OneToOne(() => Comanda_Descuento, { nullable: true })
   descuento?: Comanda_Descuento;
