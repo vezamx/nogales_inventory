@@ -6,5 +6,6 @@ import { TransactionsService } from '../transactions/transactions.service';
 @Module({
   controllers: [InsumosController],
   providers: [InsumosService, TransactionsService],
+  exports: [InsumosService],
 })
 export class InsumosModule {}

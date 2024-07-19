@@ -1,23 +1,32 @@
 import { EntityManager } from '@mikro-orm/mongodb';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Insumos } from '../entities/insumos.entity';
-import { Productos } from '../entities/productos.entity';
+import {
+  Productos,
+  Productos_Ingredientes,
+} from '../entities/productos.entity';
 import { User } from '../entities/user.entity';
 import { ERROR_MESSAGES } from '../utils/constants';
 import { ProductoUpdateDto } from './dto/producto.update';
 import { ProductosCreateDto } from './dto/productosCreate.dto';
+import { InsumosService } from '../insumos/insumos.service';
 
 @Injectable()
 export class ProductosService {
   logger = new Logger(ProductosService.name);
 
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly insumosService: InsumosService,
+  ) {}
   async find() {
     return await this.em.fork().find(Productos, {});
   }
 
-  async findOne(id: string) {
-    const producto = await this.em.fork().findOne(Productos, { id });
+  async findOne(id: string): Promise<Productos> {
+    const producto = await this.em
+      .fork()
+      .findOne(Productos, { id }, { populate: ['insumos'] });
 
     if (!producto) {
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
@@ -35,9 +44,14 @@ export class ProductosService {
 
     const producto = this.em.create(Productos, dataProducto);
 
-    const insumosArray = await Promise.all(
+    const insumosArray: Productos_Ingredientes[] = await Promise.all(
       insumos.map(async (insumoObj) => {
-        return await this.em.fork().findOne(Insumos, { id: insumoObj.id });
+        const ins = await this.em.fork().findOne(Insumos, { id: insumoObj.id });
+        const insumoProducto = this.em.create(Productos_Ingredientes, {
+          insumo: ins,
+          cantidad: insumoObj.cantidad,
+        });
+        return insumoProducto;
       }),
     );
 
@@ -49,8 +63,6 @@ export class ProductosService {
     producto.updatedBy = user;
 
     await this.em.persistAndFlush(producto);
-
-    //TODO: Implementar servicio de transacciones para guardar todos los eventos y loggearlos
 
     return producto;
   }
@@ -69,6 +81,31 @@ export class ProductosService {
 
       await this.em.persistAndFlush(producto);
       return producto;
+    } catch (error) {
+      throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+    }
+  }
+
+  async sellProduct(id: string) {
+    try {
+      const producto = await this.em
+        .fork()
+        .findOneOrFail(
+          Productos,
+          { id },
+          { populate: ['insumos', 'insumos.insumo'] },
+        );
+
+      producto.insumos.getItems().forEach(async (insumo) => {
+        this.insumosService.update(insumo.insumo.id, {
+          operacion: 'substract',
+          cantidad: insumo.cantidad,
+        });
+      });
+
+      return {
+        message: 'Producto vendido',
+      };
     } catch (error) {
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }

@@ -8,6 +8,7 @@ export type JWTPayload = {
 export type CustomRequest = Request & {
   user: string;
 };
+
 export enum EPermissionContext {
   USERS = 'users',
   ROLES = 'roles',
@@ -15,6 +16,7 @@ export enum EPermissionContext {
   INSUMOS = 'insumos',
   PRODUCTOS = 'productos',
   TRANSACTIONS = 'transactions',
+  COMANDAS = 'comandas',
 }
 export enum EPermissionAction {
   CREATE = 'create',

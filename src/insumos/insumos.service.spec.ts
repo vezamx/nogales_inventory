@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InsumosService } from './insumos.service';
 import { EntityManager, ObjectId } from '@mikro-orm/mongodb';
-import { Insumos } from 'src/entities/insumos.entity';
+import { Insumos } from '../entities/insumos.entity';
 import {
-  BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -144,12 +143,6 @@ describe('InsumosService', () => {
         insumo,
       );
       expect(insumo.cantidad).toBe(5);
-    });
-    it('should return error if invalid operation', async () => {
-      jest.spyOn(em, 'findOne').mockResolvedValue({});
-      await expect(
-        service.update('1', { operacion: 'invalid', cantidad: 5 }),
-      ).rejects.toThrow(BadRequestException);
     });
     it('should return error if insumo not updated', async () => {
       jest.spyOn(em, 'findOne').mockResolvedValue({});

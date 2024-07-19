@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InsumosController } from './insumos.controller';
 import { InsumosService } from './insumos.service';
-import { Insumos } from 'src/entities/insumos.entity';
+import { Insumos } from '../entities/insumos.entity';
 import { ObjectId } from '@mikro-orm/mongodb';
 import {
   InternalServerErrorException,

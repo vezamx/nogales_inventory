@@ -63,9 +63,8 @@ export class InsumosService {
         case 'set':
           insumo.cantidad = insumoData.cantidad;
           break;
-        default:
-          throw new BadRequestException(ERROR_MESSAGES.INVALID_OPERATION);
       }
+
       this.logger.log(FormatResourceChangeMessage(MODELS.INSUMOS, 'update'));
       await this.em.persistAndFlush(insumo);
 

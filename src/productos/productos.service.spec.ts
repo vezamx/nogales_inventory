@@ -15,6 +15,7 @@ describe('ProductosService', () => {
   let service: ProductosService;
   let em: EntityManager;
   let orm: MikroORM;
+  let mockedProd: Productos;
 
   beforeAll(async () => {
     const config = defineConfig({
@@ -27,6 +28,15 @@ describe('ProductosService', () => {
     });
 
     orm = await MikroORM.init(config);
+
+    mockedProd = orm.em.fork().create(Productos, {
+      nombre: 'test',
+      costo: 10,
+      photo_path: 'test',
+      video_path: 'test',
+    });
+
+    orm.em.persist(mockedProd);
   });
 
   beforeEach(async () => {
@@ -55,7 +65,7 @@ describe('ProductosService', () => {
   });
   describe('find', () => {
     it('should return an array of products', async () => {
-      const result = [
+      const resultProd = [
         em.create(Productos, {
           nombre: 'test',
           costo: 10,
@@ -63,23 +73,16 @@ describe('ProductosService', () => {
           video_path: 'test',
         }),
       ];
-      jest.spyOn(em, 'find').mockResolvedValue(result);
+      jest.spyOn(em, 'find').mockResolvedValue(resultProd);
 
-      expect(await service.find()).toBe(result);
+      expect(await service.find()).toBe(resultProd);
     });
   });
   describe('findOne', () => {
     it('should return a product', async () => {
-      const result = orm.em.create(Productos, {
-        nombre: 'test',
-        costo: 10,
-        photo_path: 'test',
-        video_path: 'test',
-      });
+      jest.spyOn(em, 'findOne').mockResolvedValue(mockedProd);
 
-      jest.spyOn(em, 'findOne').mockResolvedValue(result);
-
-      expect(await service.findOne('1')).toBe(result);
+      expect(await service.findOne('1')).toBe(mockedProd);
     });
     it('Should thror an error if the product does not exist', async () => {
       jest.spyOn(em, 'findOne').mockResolvedValue(null);

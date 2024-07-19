@@ -4,12 +4,14 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToOne,
   Property,
   Unique,
 } from '@mikro-orm/core';
 import { BaseEntityData } from './base';
-import { User } from './user.entity';
 import { Insumos } from './insumos.entity';
+import { User } from './user.entity';
+import { SimpleBaseData } from './simplifiedBase';
 @Entity()
 export class Productos extends BaseEntityData {
   @Property()
@@ -28,12 +30,25 @@ export class Productos extends BaseEntityData {
   @Property()
   costo: number;
 
-  @ManyToMany({ entity: () => Insumos, cascade: [Cascade.ALL] })
-  insumos = new Collection<Insumos>(this);
+  @ManyToMany({
+    entity: () => Productos_Ingredientes,
+    owner: true,
+    cascade: [Cascade.ALL],
+  })
+  insumos = new Collection<Productos_Ingredientes>(this);
 
   @ManyToOne()
   updatedBy: User;
 
   @ManyToOne()
   createdBy: User;
+}
+
+@Entity()
+export class Productos_Ingredientes extends SimpleBaseData {
+  @OneToOne(() => Insumos)
+  insumo: Insumos;
+
+  @Property()
+  cantidad: number;
 }

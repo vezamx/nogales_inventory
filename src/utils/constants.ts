@@ -6,6 +6,8 @@ export const ERROR_MESSAGES = {
   INTERNAL_SERVER_ERROR:
     'La operación no pudo ser completada. Inténtalo más tarde.',
   CONTENT_DUPLICATED: 'El contenido ya existe.',
+  PRODUCT_NOT_FOUND: 'Producto no encontrado.',
+  COMANDA_CLOSED: 'La comanda ya ha sido cerrada.',
 };
 
 export const MODELS = {
