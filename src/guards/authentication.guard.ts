@@ -7,15 +7,16 @@ import {
 import { verify } from 'jsonwebtoken';
 import { RolesService } from '../roles/roles.service';
 import { CustomRequest, EPermissionContext, JWTPayload } from '../utils/types';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-enum MapMethodToAction {
-  GET = 'read',
-  POST = 'create',
-  PUT = 'update',
-  DELETE = 'delete',
-  PATCH = 'update',
-}
+const MapMethodToAction = {
+  GET: 'read',
+  POST: 'create',
+  PUT: 'update',
+  DELETE: 'delete',
+  PATCH: 'update',
+};
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly rolesService: RolesService) {}
@@ -65,7 +66,7 @@ export class AuthGuard implements CanActivate {
 
     return true;
   }
-  catch(error) {
+  catch(error: any) {
     this.logger.error('Error en la autenticación', error.message);
     return false;
   }

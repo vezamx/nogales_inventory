@@ -23,6 +23,8 @@ export enum EPermissionContext {
   PRODUCTOS = 'productos',
   TRANSACTIONS = 'transactions',
   COMANDAS = 'comandas',
+  SECCIONES = 'secciones',
+  MESAS = 'mesas',
 }
 export enum EPermissionAction {
   CREATE = 'create',
