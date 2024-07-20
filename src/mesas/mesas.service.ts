@@ -29,6 +29,7 @@ export class MesasService {
 
       return mesa;
     } catch (e) {
+      this.logger.error(e);
       throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
     }
   }
@@ -48,17 +49,23 @@ export class MesasService {
 
       return mesa;
     } catch (e) {
+      this.logger.error(e);
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }
 
   async createSeccion(data: SeccionCreateDto): Promise<Seccion> {
-    const seccion = this.em.fork().create(Seccion, {
-      nombre: data.nombre,
-    });
-    await this.em.fork().persistAndFlush(seccion);
+    try {
+      const seccion = this.em.fork().create(Seccion, {
+        nombre: data.nombre,
+      });
+      await this.em.fork().persistAndFlush(seccion);
 
-    return seccion;
+      return seccion;
+    } catch (e) {
+      this.logger.error(e);
+      throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+    }
   }
 
   async deleteMesa(id: string): Promise<CommonAPIResponse<Mesa>> {
@@ -81,6 +88,7 @@ export class MesasService {
         data: mesa,
       };
     } catch (e) {
+      this.logger.error(e);
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }
@@ -116,6 +124,7 @@ export class MesasService {
         data: seccion,
       };
     } catch (e) {
+      this.logger.error(e);
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }

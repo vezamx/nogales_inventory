@@ -11,6 +11,8 @@ export const ERROR_MESSAGES = {
   MESA_HAS_COMANDAS: 'La mesa tiene comandas activas.',
   WARNING_SECTIONS_DELETE:
     'La sección fue eliminaram con exito, sin embargo, las mesas asignadas a esta seccion fueron eliminadas igualmente.',
+  MESA_HAS_COMANDA:
+    'La mesa ya tiene una comanda abierta. Si deseas aabrir una comanda en esa mesa, separa la mesa en dos comandas.',
 };
 
 export const MODELS = {

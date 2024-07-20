@@ -1,15 +1,29 @@
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MesasService } from './mesas.service';
 import { Mesa } from '../entities/mesa.entity';
 import { MesaCreateDto } from './dto/mesaCreate.dto';
 import { Seccion } from '../entities/seccion.entity';
 import { SeccionCreateDto } from './dto/seccionCreate.dto';
 import { CommonAPIResponse } from '../utils/types';
+import { AuthGuard } from '../guards/authentication.guard';
+import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
+import { NotTransactable } from '../decorators/notTransactable.decorator';
 
+@UseInterceptors(TransactionsInterceptor)
+@UseGuards(AuthGuard)
 @Controller('mesas')
 export class MesasController {
   constructor(private readonly mesasService: MesasService) {}
 
+  @NotTransactable()
   @Get('/')
   async find(): Promise<Mesa[]> {
     return await this.mesasService.find();
@@ -21,12 +35,12 @@ export class MesasController {
   }
 
   @Post('/')
-  async create(data: MesaCreateDto): Promise<Mesa> {
+  async create(@Body() data: MesaCreateDto): Promise<Mesa> {
     return await this.mesasService.create(data);
   }
 
   @Post('/seccion')
-  async createSeccion(data: SeccionCreateDto): Promise<Seccion> {
+  async createSeccion(@Body() data: SeccionCreateDto): Promise<Seccion> {
     return await this.mesasService.createSeccion(data);
   }
 

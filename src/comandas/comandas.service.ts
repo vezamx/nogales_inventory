@@ -60,7 +60,23 @@ export class ComandasService {
         id: comandaData.mesaId,
       });
 
+      const comandasEnMesa = await this.em.fork().count(Comanda, {
+        mesa: mesa,
+        status: {
+          $in: ['abierta'],
+        },
+      });
+
+      console.log('A ver este pedo deberia mostrar', comandasEnMesa);
+
+      if (comandasEnMesa > 0) {
+        this.logger.error('Mesa already has an open comanda');
+        throw new NotAcceptableException(ERROR_MESSAGES.MESA_HAS_COMANDA);
+      }
+
       const comanda = this.em.create(Comanda, comandaData);
+
+      console.log('comanda');
 
       comanda.mesa = mesa;
       comanda.createdBy = user;
