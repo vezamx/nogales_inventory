@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   UseGuards,
   UseInterceptors,
@@ -30,7 +31,7 @@ export class MesasController {
   }
 
   @Get('/:id')
-  async findOne(id: string): Promise<Mesa> {
+  async findOne(@Param('id') id: string): Promise<Mesa> {
     return await this.mesasService.findOne(id);
   }
 
@@ -39,12 +40,12 @@ export class MesasController {
     return await this.mesasService.create(data);
   }
 
-  @Post('/seccion')
+  @Post('/secciones')
   async createSeccion(@Body() data: SeccionCreateDto): Promise<Seccion> {
     return await this.mesasService.createSeccion(data);
   }
 
-  @Delete('/seccion/:id')
+  @Delete('/secciones/:id')
   async deleteSeccion(id: string): Promise<CommonAPIResponse<Seccion>> {
     return await this.mesasService.deleteSeccion(id);
   }

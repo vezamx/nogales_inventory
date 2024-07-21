@@ -1,4 +1,4 @@
-import { EntityManager } from '@mikro-orm/mongodb';
+import { EntityManager, wrap } from '@mikro-orm/mongodb';
 import {
   BadRequestException,
   ForbiddenException,
@@ -18,6 +18,8 @@ import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { ComandaTicketsService } from '../comanda_tickets/comanda_tickets.service';
 import { Mesa } from 'src/entities/mesa.entity';
+import { ComandaDividirDto } from './dto/comandaDividir.dto';
+import { CommonAPIResponse } from 'src/utils/types';
 
 @Injectable()
 export class ComandasService {
@@ -67,8 +69,6 @@ export class ComandasService {
         },
       });
 
-      console.log('A ver este pedo deberia mostrar', comandasEnMesa);
-
       if (comandasEnMesa > 0) {
         this.logger.error('Mesa already has an open comanda');
         throw new NotAcceptableException(ERROR_MESSAGES.MESA_HAS_COMANDA);
@@ -76,8 +76,7 @@ export class ComandasService {
 
       const comanda = this.em.create(Comanda, comandaData);
 
-      console.log('comanda');
-
+      comanda.status = 'abierta';
       comanda.mesa = mesa;
       comanda.createdBy = user;
       comanda.updatedBy = user;
@@ -86,6 +85,12 @@ export class ComandasService {
       return comanda;
     } catch (error) {
       this.logger.error(`Error creating comanda: ${error}`);
+      if (
+        error instanceof NotAcceptableException ||
+        error instanceof ForbiddenException
+      )
+        throw error;
+
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }
@@ -190,6 +195,70 @@ export class ComandasService {
       };
     } catch (error) {
       this.logger.error(`Error applying discount: ${error}`);
+      throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+    }
+  }
+
+  async dividirComanda(
+    { productosIds }: ComandaDividirDto,
+    comandaId: string,
+    userId: string,
+  ): Promise<CommonAPIResponse<Comanda>> {
+    try {
+      const user = await this.em.findOne(User, { id: userId });
+
+      if (!user) {
+        this.logger.error(
+          `User with id ${userId} not found, while closing comanda`,
+        );
+        throw new ForbiddenException(ERROR_MESSAGES.FORBIDDEN);
+      }
+
+      const comanda = await this.em.findOne(
+        Comanda,
+        { id: comandaId },
+        { populate: ['productos'] },
+      );
+
+      const { id, productos, ...comandaData } = wrap(comanda).toPOJO();
+
+      const newComanda = this.em.create(Comanda, comandaData);
+
+      productosIds.forEach(async (productoId) => {
+        const producto = await this.em.findOne(Productos, productoId);
+        if (!producto) {
+          this.logger.error("Can't add product to comanda, product not found");
+          throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+        }
+        newComanda.productos.add(producto);
+        comanda.productos.remove(producto);
+      });
+
+      console.log('comanda', comanda);
+      console.log('newComanda', newComanda);
+
+      if (newComanda.productos.count() === 0) {
+        throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+      }
+
+      comanda.updatedBy = user;
+      await this.em.persistAndFlush([comanda, newComanda]);
+
+      if (newComanda.productos.count() < productosIds.length) {
+        return {
+          ok: true,
+          message: 'Algunos productos no se pudieron dividir',
+          data: newComanda,
+        };
+      }
+
+      return {
+        ok: true,
+        message: 'Comanda dividida con éxito',
+        data: newComanda,
+      };
+    } catch (error) {
+      this.logger.error(`Error dividiando comanda: ${error}`);
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }

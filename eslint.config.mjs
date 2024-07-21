@@ -38,8 +38,8 @@ export default [
       sourceType: 'module',
 
       parserOptions: {
-        project: 'tsconfig.json',
-        tsconfigRootDir: '/Users/zomodan/dev/nogales_inventory',
+        project: './tsconfig.json',
+        tsconfigRootDir: path.resolve(__dirname),
       },
     },
 

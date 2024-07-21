@@ -20,6 +20,7 @@ import { CustomRequest } from '../utils/types';
 import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { CloseComandaDto } from './dto/closeComanda.dto';
+import { ComandaDividirDto } from './dto/comandaDividir.dto';
 
 @UseInterceptors(TransactionsInterceptor)
 @UseGuards(AuthGuard)
@@ -43,6 +44,15 @@ export class ComandasController {
     @Req() req: CustomRequest,
   ) {
     return this.comandasService.create(comandaData, req.user);
+  }
+
+  @Put('/dividir/:id')
+  async dividirComanda(
+    @Param('id') id: string,
+    @Body() comandaData: ComandaDividirDto,
+    @Req() req: CustomRequest,
+  ) {
+    return this.comandasService.dividirComanda(comandaData, id, req.user);
   }
 
   @Put('/productos/:id')
