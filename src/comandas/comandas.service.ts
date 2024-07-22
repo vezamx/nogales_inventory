@@ -1,4 +1,4 @@
-import { EntityManager, wrap } from '@mikro-orm/mongodb';
+import { EntityManager } from '@mikro-orm/mongodb';
 import {
   BadRequestException,
   ForbiddenException,
@@ -220,29 +220,32 @@ export class ComandasService {
         { populate: ['productos'] },
       );
 
-      const { id, productos, ...comandaData } = wrap(comanda).toPOJO();
+      if (!comanda) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+
+      const { id, _id, productos, ...comandaData } = comanda;
 
       const newComanda = this.em.create(Comanda, comandaData);
 
-      productosIds.forEach(async (productoId) => {
-        const producto = await this.em.findOne(Productos, productoId);
-        if (!producto) {
-          this.logger.error("Can't add product to comanda, product not found");
-          throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
-        }
-        newComanda.productos.add(producto);
-        comanda.productos.remove(producto);
+      const newProductos = comanda.productos.filter((producto) => {
+        return productosIds.includes(producto.id);
       });
 
-      console.log('comanda', comanda);
-      console.log('newComanda', newComanda);
+      for (const producto of newProductos) {
+        comanda.productos.remove(producto);
+        newComanda.productos.add(producto);
+      }
 
       if (newComanda.productos.count() === 0) {
-        throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+        throw new NotAcceptableException(ERROR_MESSAGES.BAD_REQUEST);
       }
 
       comanda.updatedBy = user;
-      await this.em.persistAndFlush([comanda, newComanda]);
+      newComanda.updatedBy = user;
+
+      this.em.persist(comanda);
+      this.em.persist(newComanda);
+
+      await this.em.flush();
 
       if (newComanda.productos.count() < productosIds.length) {
         return {
@@ -259,6 +262,12 @@ export class ComandasService {
       };
     } catch (error) {
       this.logger.error(`Error dividiando comanda: ${error}`);
+      if (
+        error instanceof NotAcceptableException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }
