@@ -21,6 +21,7 @@ import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { CloseComandaDto } from './dto/closeComanda.dto';
 import { ComandaDividirDto } from './dto/comandaDividir.dto';
+import { UnirComandasDto } from './dto/unirComandas.dto';
 
 @UseInterceptors(TransactionsInterceptor)
 @UseGuards(AuthGuard)
@@ -53,6 +54,14 @@ export class ComandasController {
     @Req() req: CustomRequest,
   ) {
     return this.comandasService.dividirComanda(comandaData, id, req.user);
+  }
+
+  @Put('/unir')
+  async unirComandas(
+    @Body() comandaData: UnirComandasDto,
+    @Req() req: CustomRequest,
+  ) {
+    return this.comandasService.joinComandas(comandaData, req.user);
   }
 
   @Put('/productos/:id')

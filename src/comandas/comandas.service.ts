@@ -20,6 +20,7 @@ import { ComandaTicketsService } from '../comanda_tickets/comanda_tickets.servic
 import { Mesa } from 'src/entities/mesa.entity';
 import { ComandaDividirDto } from './dto/comandaDividir.dto';
 import { CommonAPIResponse } from 'src/utils/types';
+import { UnirComandasDto } from './dto/unirComandas.dto';
 
 @Injectable()
 export class ComandasService {
@@ -265,6 +266,56 @@ export class ComandasService {
       if (
         error instanceof NotAcceptableException ||
         error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+    }
+  }
+
+  async joinComandas(
+    { comandaId, comandaIdToJoin }: UnirComandasDto,
+    userId: string,
+  ): Promise<CommonAPIResponse<Comanda>> {
+    try {
+      const user = await this.em.findOne(User, { id: userId });
+
+      if (!user) throw new ForbiddenException(ERROR_MESSAGES.NOT_FOUND);
+
+      const comanda = await this.em.findOne(
+        Comanda,
+        { id: comandaId },
+        { populate: ['productos', 'comandasAdjuntas'] },
+      );
+      if (!comanda) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+      const comandaToJoin = await this.em.findOne(
+        Comanda,
+        { id: comandaIdToJoin },
+        { populate: ['productos'] },
+      );
+      if (!comandaToJoin) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+      comandaToJoin.productos.getItems().forEach((producto) => {
+        comanda.productos.add(producto);
+      });
+
+      comanda.comandasAdjuntas.add(comandaToJoin);
+
+      comanda.updatedBy = user;
+
+      this.em.persist(comanda);
+      this.em.remove(comandaToJoin);
+      await this.em.flush();
+      return {
+        ok: true,
+        message: 'Comandas unidas con éxito',
+        data: comanda,
+      };
+    } catch (error) {
+      this.logger.error(`Error uniendo comandas: ${error}`);
+      if (
+        error instanceof NotAcceptableException ||
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
       ) {
         throw error;
       }
