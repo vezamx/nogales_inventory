@@ -17,6 +17,10 @@ import { Productos } from '../entities/productos.entity';
 import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { ComandaTicketsService } from '../comanda_tickets/comanda_tickets.service';
+import { Mesa } from '../entities/mesa.entity';
+import { ComandaDividirDto } from './dto/comandaDividir.dto';
+import { CommonAPIResponse } from '../utils/types';
+import { UnirComandasDto } from './dto/unirComandas.dto';
 
 @Injectable()
 export class ComandasService {
@@ -55,8 +59,26 @@ export class ComandasService {
         throw new ForbiddenException(ERROR_MESSAGES.FORBIDDEN);
       }
 
+      const mesa = await this.em.findOne(Mesa, {
+        id: comandaData.mesaId,
+      });
+
+      const comandasEnMesa = await this.em.fork().count(Comanda, {
+        mesa: mesa,
+        status: {
+          $in: ['abierta'],
+        },
+      });
+
+      if (comandasEnMesa > 0) {
+        this.logger.error('Mesa already has an open comanda');
+        throw new NotAcceptableException(ERROR_MESSAGES.MESA_HAS_COMANDA);
+      }
+
       const comanda = this.em.create(Comanda, comandaData);
 
+      comanda.status = 'abierta';
+      comanda.mesa = mesa;
       comanda.createdBy = user;
       comanda.updatedBy = user;
 
@@ -64,6 +86,12 @@ export class ComandasService {
       return comanda;
     } catch (error) {
       this.logger.error(`Error creating comanda: ${error}`);
+      if (
+        error instanceof NotAcceptableException ||
+        error instanceof ForbiddenException
+      )
+        throw error;
+
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }
@@ -168,6 +196,130 @@ export class ComandasService {
       };
     } catch (error) {
       this.logger.error(`Error applying discount: ${error}`);
+      throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+    }
+  }
+
+  async dividirComanda(
+    { productosIds }: ComandaDividirDto,
+    comandaId: string,
+    userId: string,
+  ): Promise<CommonAPIResponse<Comanda>> {
+    try {
+      const user = await this.em.findOne(User, { id: userId });
+
+      if (!user) {
+        this.logger.error(
+          `User with id ${userId} not found, while closing comanda`,
+        );
+        throw new ForbiddenException(ERROR_MESSAGES.FORBIDDEN);
+      }
+
+      const comanda = await this.em.findOne(
+        Comanda,
+        { id: comandaId },
+        { populate: ['productos'] },
+      );
+
+      if (!comanda) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+
+      const { id, _id, productos, ...comandaData } = comanda;
+
+      const newComanda = this.em.create(Comanda, comandaData);
+
+      const newProductos = comanda.productos.filter((producto) => {
+        return productosIds.includes(producto.id);
+      });
+
+      for (const producto of newProductos) {
+        comanda.productos.remove(producto);
+        newComanda.productos.add(producto);
+      }
+
+      if (newComanda.productos.count() === 0) {
+        throw new NotAcceptableException(ERROR_MESSAGES.BAD_REQUEST);
+      }
+
+      comanda.updatedBy = user;
+      newComanda.updatedBy = user;
+
+      this.em.persist(comanda);
+      this.em.persist(newComanda);
+
+      await this.em.flush();
+
+      if (newComanda.productos.count() < productosIds.length) {
+        return {
+          ok: true,
+          message: 'Algunos productos no se pudieron dividir',
+          data: newComanda,
+        };
+      }
+
+      return {
+        ok: true,
+        message: 'Comanda dividida con éxito',
+        data: newComanda,
+      };
+    } catch (error) {
+      this.logger.error(`Error dividiando comanda: ${error}`);
+      if (
+        error instanceof NotAcceptableException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
+    }
+  }
+
+  async joinComandas(
+    { comandaId, comandaIdToJoin }: UnirComandasDto,
+    userId: string,
+  ): Promise<CommonAPIResponse<Comanda>> {
+    try {
+      const user = await this.em.findOne(User, { id: userId });
+
+      if (!user) throw new ForbiddenException(ERROR_MESSAGES.NOT_FOUND);
+
+      const comanda = await this.em.findOne(
+        Comanda,
+        { id: comandaId },
+        { populate: ['productos', 'mesasAdjuntas'] },
+      );
+      if (!comanda) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+      const comandaToJoin = await this.em.findOne(
+        Comanda,
+        { id: comandaIdToJoin },
+        { populate: ['productos'] },
+      );
+      if (!comandaToJoin) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+      comandaToJoin.productos.getItems().forEach((producto) => {
+        comanda.productos.add(producto);
+      });
+
+      comanda.mesasAdjuntas.add(comandaToJoin.mesa);
+      comanda.updatedBy = user;
+      comandaToJoin.status = 'cancelada_unida';
+
+      this.em.persist(comanda);
+      this.em.persist(comandaToJoin);
+
+      await this.em.flush();
+      return {
+        ok: true,
+        message: 'Comandas unidas con éxito',
+        data: comanda,
+      };
+    } catch (error) {
+      this.logger.error(`Error uniendo comandas: ${error}`);
+      if (
+        error instanceof NotAcceptableException ||
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
       throw new BadRequestException(ERROR_MESSAGES.BAD_REQUEST);
     }
   }

@@ -9,6 +9,12 @@ export type CustomRequest = Request & {
   user: string;
 };
 
+export type CommonAPIResponse<T> = {
+  message: string;
+  ok: boolean;
+  data?: T;
+};
+
 export enum EPermissionContext {
   USERS = 'users',
   ROLES = 'roles',
@@ -17,6 +23,8 @@ export enum EPermissionContext {
   PRODUCTOS = 'productos',
   TRANSACTIONS = 'transactions',
   COMANDAS = 'comandas',
+  SECCIONES = 'secciones',
+  MESAS = 'mesas',
 }
 export enum EPermissionAction {
   CREATE = 'create',
