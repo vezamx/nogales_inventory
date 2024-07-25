@@ -54,7 +54,7 @@ export class Comanda extends BaseEntityData {
   mesa: Mesa;
 
   @ManyToMany({ entity: () => Comanda, nullable: true })
-  comandasAdjuntas? = new Collection<Comanda>(this);
+  mesasAdjuntas? = new Collection<Mesa>(this);
 
   @OneToOne(() => Comanda_Descuento, { nullable: true })
   descuento?: Comanda_Descuento;

@@ -5,13 +5,13 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Mesa } from 'src/entities/mesa.entity';
+import { Mesa } from '../entities/mesa.entity';
 import { MesaCreateDto } from './dto/mesaCreate.dto';
-import { Seccion } from 'src/entities/seccion.entity';
-import { ERROR_MESSAGES } from 'src/utils/constants';
+import { Seccion } from '../entities/seccion.entity';
+import { ERROR_MESSAGES } from '../utils/constants';
 import { SeccionCreateDto } from './dto/seccionCreate.dto';
-import { Comanda, EStatusComanda } from 'src/entities/comandas.entity';
-import { CommonAPIResponse } from 'src/utils/types';
+import { Comanda, EStatusComanda } from '../entities/comandas.entity';
+import { CommonAPIResponse } from '../utils/types';
 
 @Injectable()
 export class MesasService {

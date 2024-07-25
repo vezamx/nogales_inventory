@@ -17,9 +17,9 @@ import { Productos } from '../entities/productos.entity';
 import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { ComandaTicketsService } from '../comanda_tickets/comanda_tickets.service';
-import { Mesa } from 'src/entities/mesa.entity';
+import { Mesa } from '../entities/mesa.entity';
 import { ComandaDividirDto } from './dto/comandaDividir.dto';
-import { CommonAPIResponse } from 'src/utils/types';
+import { CommonAPIResponse } from '../utils/types';
 import { UnirComandasDto } from './dto/unirComandas.dto';
 
 @Injectable()
@@ -285,7 +285,7 @@ export class ComandasService {
       const comanda = await this.em.findOne(
         Comanda,
         { id: comandaId },
-        { populate: ['productos', 'comandasAdjuntas'] },
+        { populate: ['productos', 'mesasAdjuntas'] },
       );
       if (!comanda) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
       const comandaToJoin = await this.em.findOne(
@@ -298,12 +298,13 @@ export class ComandasService {
         comanda.productos.add(producto);
       });
 
-      comanda.comandasAdjuntas.add(comandaToJoin);
-
+      comanda.mesasAdjuntas.add(comandaToJoin.mesa);
       comanda.updatedBy = user;
+      comandaToJoin.status = 'cancelada_unida';
 
       this.em.persist(comanda);
-      this.em.remove(comandaToJoin);
+      this.em.persist(comandaToJoin);
+
       await this.em.flush();
       return {
         ok: true,
