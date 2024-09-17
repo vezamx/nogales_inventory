@@ -11,16 +11,18 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ComandasService } from './comandas.service';
-import { ComandasGetQueryDto } from './dto/comandasGetQuery.dto';
-import { ComandaCreateDto } from './dto/comandaCreate.dto';
+import { NotTransactable } from 'src/decorators/notTransactable.decorator';
+import { Public } from 'src/decorators/roles.decorator';
 import { AuthGuard } from '../guards/authentication.guard';
 import { TransactionsInterceptor } from '../interceptors/transactions.interceptor';
 import { CustomRequest } from '../utils/types';
-import { GirarDescuentoDto } from './dto/girarDescuento.dto';
+import { ComandasService } from './comandas.service';
 import { AddProductoToComandaDto } from './dto/addProductoToComanda.dto';
 import { CloseComandaDto } from './dto/closeComanda.dto';
+import { ComandaCreateDto } from './dto/comandaCreate.dto';
 import { ComandaDividirDto } from './dto/comandaDividir.dto';
+import { ComandasGetQueryDto } from './dto/comandasGetQuery.dto';
+import { GirarDescuentoDto } from './dto/girarDescuento.dto';
 import { UnirComandasDto } from './dto/unirComandas.dto';
 
 @UseInterceptors(TransactionsInterceptor)
@@ -28,7 +30,9 @@ import { UnirComandasDto } from './dto/unirComandas.dto';
 @Controller('comandas')
 export class ComandasController {
   constructor(private readonly comandasService: ComandasService) {}
-
+  
+  @NotTransactable()
+  @Public()
   @Get('/')
   async getComandas(@Query() comandasQuery: ComandasGetQueryDto) {
     return this.comandasService.find(comandasQuery);
