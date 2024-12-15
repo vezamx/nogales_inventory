@@ -1,3 +1,6 @@
+### REPOSITORIO QUEDÓ DEPRECADO, SU VERSIÓN NUEVA SERÁ [nogales_inventory_api](https://github.com/vezamx/nogales_inventory_api)
+
+
 # Casa nogales Inventory API
 
 ## Description
